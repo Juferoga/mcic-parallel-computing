@@ -30,7 +30,7 @@ Este repositorio centraliza los ejercicios, talleres y el Proyecto Final realiza
 - `0.Bibliografia/` — Material de referencia y recursos bibliográficos.
 - `1.Tareas/` — Entregas formales por actividad.
 - `2.Talleres/` — Ejercicios prácticos y pequeñas aplicaciones.
-- `3.Trabajos/` — Trabajos grupales y entregas mayores.
+- `3.Retos/` — Trabajos de corte.
 - `4.ProyectoFinal/` — Código y documentación del proyecto final.
 - `README.md` — Este archivo.
 - `LICENSE` — Licencia del repositorio.

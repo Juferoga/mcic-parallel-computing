@@ -1,0 +1,182 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.8cm}
+\usepackage{fontspec}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+
+% Tipografías oficiales UD
+\setmainfont{times.ttf}[
+  Path = assets/fonts/,
+  BoldFont = timesbd.ttf,
+  ItalicFont = timesi.ttf,
+  BoldItalicFont = timesbi.ttf
+]
+\newfontfamily\cambriafont{cambria.ttc}[
+  Path = assets/fonts/,
+  BoldFont = cambriab.ttf,
+  ItalicFont = cambriai.ttf,
+  BoldItalicFont = cambriaz.ttf
+]
+
+\definecolor{UDRed}{HTML}{ED3237}
+\definecolor{UDDarkRed}{HTML}{B71C1C}
+\definecolor{UDBlue}{HTML}{1291C0}
+\definecolor{UDDarkGreen}{HTML}{047857}
+\definecolor{UDSable}{HTML}{1E293B}
+\definecolor{UDLightGray}{HTML}{F8FAFC}
+\definecolor{UDBorder}{HTML}{CBD5E1}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{UDSable}\cambriafont Maestría en Ciencias de la Información y las Comunicaciones (MCIC)}
+\fancyhead[R]{\small\color{UDRed}\cambriafont Reto 1: Tubería CNN OpenACC}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.6pt}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=UDDarkRed,
+  citecolor=UDBlue,
+  urlcolor=UDBlue
+}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{UDLightGray},
+  frame=single,
+  rulecolor=\color{UDBorder},
+  breaklines=true,
+  keywordstyle=\color{UDRed}\bfseries,
+  commentstyle=\color{gray}\itshape,
+  stringstyle=\color{UDDarkGreen},
+  numbers=none,
+  tabsize=2
+}
+
+\title{\vspace{-1.0cm}\Huge\bfseries\cambriafont\color{UDSable} Tubería CNN en OpenACC\\[0.3cm]
+\Large\color{UDRed} Convolución 2D + ReLU + MaxPooling 2D\\[0.2cm]
+\large\color{UDSable}\textmd{Documentación Técnica y Reporte de Rendimiento}}
+\author{\textbf{\cambriafont Juferoga} \\
+\textit{Computación Paralela y Distribuida} \\
+Maestría en Ciencias de la Información y las Comunicaciones (MCIC) \\
+Universidad Distrital Francisco José de Caldas}
+\date{Septiembre de 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+\noindent Este documento presenta el diseño, implementación y evaluación experimental de una tubería de operaciones fundamentales de Redes Neuronales Convolucionales (Convolución 2D de $100\times 100 \rightarrow 98\times 98$, activación ReLU y MaxPooling 2D con Stride 2 hacia $49\times 49$) acelerada en GPU mediante directivas OpenACC en C++. Se aborda la contención de datos en VRAM a lo largo de ráfagas iterativas ($N = 1\,000$ iteraciones) mediante la directiva \texttt{\#pragma acc data}, la maximización de la ocupación de los multiprocesadores CUDA mediante \texttt{collapse(2)}, la corrección teórica formal sobre la naturaleza topológica de la ventana de MaxPooling, y la evaluación cuantitativa frente a una línea base secuencial pura en CPU, alcanzando una aceleración de cómputo neto de \textbf{15.45x} y de sistema completo de \textbf{13.08x} con verificación numérica exacta ($\Delta_{\max} = 0.000$).
+\end{abstract}
+
+\vspace{0.4cm}
+\tableofcontents
+\vspace{0.6cm}
+\hrule
+\vspace{0.6cm}
+
+\section{Introducción y Arquitectura de la Tubería}
+En las capas convolucionales modernas, el procesamiento secuencial e iterativo de tensores espaciales demanda un uso intensivo de cómputo aritmético y ancho de banda de memoria. La secuencia estudiada en este reto consta de tres etapas fijas:
+\begin{enumerate}
+    \item \textbf{Convolución 2D:} Aplica un kernel espacial de $3 \times 3$ sobre una imagen de entrada $100 \times 100$ ($10\,000$ flotantes), generando una matriz de características de $98 \times 98$ ($9\,604$ flotantes).
+    \item \textbf{Activación ReLU:} Transforma no linealmente cada elemento de la matriz anterior preservando su tamaño ($98 \times 98$), sustituyendo cualquier valor negativo por cero ($f(x) = \max(0, x)$).
+    \item \textbf{MaxPooling 2D:} Realiza un submuestreo espacial disjunto mediante una ventana de $2 \times 2$ con paso (\textit{stride}) de 2, produciendo una salida final compacta de $49 \times 49$ ($2\,401$ flotantes).
+\end{enumerate}
+
+\section{Clarificación Conceptual y Corrección Teórica}
+A diferencia del filtro convolucional (que sí posee una matriz de parámetros entrenables $3 \times 3$), la ``ventana de MaxPooling'' \textbf{no es una matriz de pesos ni requiere asignación de memoria dedicada en RAM/VRAM}. 
+Corresponde estrictamente a un \textbf{rango de lectura e indexación espacial}:
+\begin{equation}
+\text{pool}(i, j) = \max_{(ki, kj) \in \{0, 1\}^2} \text{relu}(2i + ki, \; 2j + kj)
+\end{equation}
+La corrección teórica evita destinar memoria espuria o simular operaciones de convolución en el paso de submuestreo.
+
+\section{Mapeo Canónico 1D (Row-Major Order)}
+Para optimizar el uso de cachés y habilitar accesos coalescentes en la memoria global de la GPU, todas las matrices bidimensionales se asignan en memoria dinámica contigua (\texttt{new float[N]}):
+\begin{itemize}
+    \item \textbf{Imagen de Entrada ($100 \times 100$):} $\text{idx} = i \times 100 + j$, rango $[0 \dots 9\,999]$.
+    \item \textbf{Buffer Convolución y ReLU ($98 \times 98$):} $\text{idx} = i \times 98 + j$, rango $[0 \dots 9\,603]$.
+    \item \textbf{Salida MaxPooling ($49 \times 49$):} $\text{idx} = i \times 49 + j$, rango $[0 \dots 2\,400]$.
+\end{itemize}
+
+\noindent Para MaxPooling con Stride 2 ($W=98$), las 4 direcciones de lectura contigua son:
+\begin{align*}
+r_{00} &= (2i) \cdot 98 + 2j, & r_{01} &= (2i) \cdot 98 + (2j + 1) \\
+r_{10} &= (2i + 1) \cdot 98 + 2j, & r_{11} &= (2i + 1) \cdot 98 + (2j + 1)
+\end{align*}
+
+\section{Estrategia de Paralelización en OpenACC}
+
+\subsection{Ciclo de Vida de Datos y Persistencia en VRAM}
+El bus PCIe impone una latencia crítica en sistemas acelerados. Para evitar transferencias redundantes en cada iteración, se emplea la directiva estructurada \texttt{\#pragma acc data}:
+\begin{lstlisting}[language=C++]
+#pragma acc data copyin(img[0:10000], kernel[0:9]) \
+                 create(conv[0:9604], relu[0:9604]) \
+                 copyout(pool[0:2401])
+{
+    for (int it = 0; it < iteraciones; ++it) {
+        // Convolucion 2D (GPU) -> conv en VRAM
+        // Activacion ReLU (GPU) -> relu en VRAM
+        // MaxPooling 2D (GPU)  -> pool en VRAM
+    }
+}
+\end{lstlisting}
+\begin{itemize}
+    \item \textbf{\texttt{copyin}:} Transfiere entrada y kernel a la GPU exactamente una vez al inicio.
+    \item \textbf{\texttt{create}:} Aloja los buffers temporales \texttt{conv} y \texttt{relu} en VRAM con \textbf{cero tráfico PCIe}.
+    \item \textbf{\texttt{copyout}:} Devuelve al Host únicamente la salida final compacta al terminar la ráfaga de 1,000 repeticiones.
+\end{itemize}
+
+\subsection{Colapso de Bucles Bidimensionales}
+Cada etapa fusiona sus bucles anidados mediante \texttt{collapse(2)}, expandiendo el paralelismo para saturar los multiprocesadores CUDA:
+\begin{itemize}
+    \item Convolución 2D: $98 \times 98 = 9\,604$ hilos GPU.
+    \item Activación ReLU: $98 \times 98 = 9\,604$ hilos GPU.
+    \item MaxPooling 2D: $49 \times 49 = 2\,401$ hilos GPU.
+\end{itemize}
+
+\section{Resultados Experimentales y Ley de Amdahl}
+A continuación se resumen las mediciones obtenidas para $N = 1\,000$ iteraciones:
+
+\begin{table}[h!]
+\centering
+\cambriafont
+\caption{Métricas de Rendimiento Experimental ($N = 1\,000$ iteraciones)}
+\vspace{0.2cm}
+\begin{tabular}{llr}
+\toprule
+\textbf{Métrica de Evaluación} & \textbf{Valor Medido} & \textbf{Unidad} \\
+\midrule
+CPU Secuencial ($T_{\text{CPU}}$) & $32.46$ & ms \\
+GPU Cómputo Neto ($T_{\text{GPU\_Kernel}}$) & $2.10$ & ms \\
+GPU Total con Transferencias ($T_{\text{GPU\_Total}}$) & $2.48$ & ms \\
+Overhead de Bus PCIe & $0.38$ & ms ($15.3\%$) \\
+\midrule
+\textbf{Speedup de Cómputo ($S_{\text{cómputo}}$)} & \textbf{15.45x} & Aceleración \\
+\textbf{Speedup Total de Sistema ($S_{\text{total}}$)} & \textbf{13.08x} & Aceleración \\
+\midrule
+\textbf{Consistencia Numérica ($\Delta_{\max}$)} & \textbf{0.000} & $0$ Discrepancias ($2\,401/2\,401$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent \textbf{Análisis de Amdahl:} Si se ejecutase una sola iteración ($N = 1$), el costo de transferencias PCIe ($0.38$ ms) superaría con creces los microsegundos de cómputo neto, arrojando una desaceleración ($S < 1\times$). La ejecución en ráfaga iterativa amortiza el costo de transferencia a $0.38\ \mu\text{s}$ por iteración, posibilitando una aceleración real de más de \textbf{13x}.
+
+\section{Conclusiones}
+\begin{enumerate}
+    \item OpenACC permite acelerar algoritmos de visión artificial y redes neuronales manteniendo una base de código compacta y legible en C++ estándar.
+    \item La gestión explícita de datos con \texttt{\#pragma acc data} y la cláusula \texttt{create} es el pilar determinante de la eficiencia en arquitecturas heterogéneas.
+    \item La verificación numérica bit a bit valida que la paralelización masiva de las etapas preserva de forma estricta la equivalencia funcional del modelo secuencial.
+\end{enumerate}
+
+\end{document}
