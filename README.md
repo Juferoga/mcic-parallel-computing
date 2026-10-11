@@ -6,34 +6,41 @@
 
 [![Autor: Juferoga](https://img.shields.io/badge/Autor-Juferoga-0a66c2?style=flat-square)](https://github.com/Juferoga) [![License: GPL2](https://img.shields.io/badge/License-GPL2-blue?style=flat-square)](LICENSE)
 
-Repositorio de apoyo para la asignatura *Computación Paralela* (Maestría). Aquí se conservan los talleres, tareas y el proyecto final desarrollado durante el semestre.
+Repositorio de la asignatura *Computación Paralela* (Maestría). Aquí se conservan los talleres, retos y el proyecto final desarrollados durante el semestre.
 
 **Contenido rápido**
 
-- **Estado:** Material docente y trabajos del curso.
+- **Estado:** En curso — semestre 2026-3
 - **Autor:** Juan Felipe Rodríguez Galindo (Juferoga)
 - **Docente:** Nelson Enrique Vera Parra
 - **Licencia:** GPL2 — ver archivo `LICENSE`
 
 **Tabla de contenidos**
 
-- Descripción
+- Avance
 - Estructura del repositorio
 - Licencia
 
-**Descripción**
+## Avance
 
-Este repositorio centraliza los ejercicios, talleres y el Proyecto Final realizados en la asignatura. Está organizado por carpetas numeradas para facilitar la navegación y revisión.
+| Entrega | Tema | Carpeta |
+|---|---|---|
+| Reto 1 | Tubería CNN (convolución 2D + ReLU + MaxPooling) acelerada en GPU con OpenACC; speedup medido frente a CPU, documentación técnica y presentación Beamer | [`3.Retos/1.Reto/`](3.Retos/1.Reto/) |
+| Proyecto final | Pendiente | [`4.ProyectoFinal/`](4.ProyectoFinal/) |
 
-**Estructura del repositorio (resumen)**
+Detalle del Reto 1 (compilación, ejecución y resultados): [`3.Retos/1.Reto/README.md`](3.Retos/1.Reto/README.md).
+
+## Estructura del repositorio
 
 - `0.Bibliografia/` — Material de referencia y recursos bibliográficos.
 - `1.Tareas/` — Entregas formales por actividad.
 - `2.Talleres/` — Ejercicios prácticos y pequeñas aplicaciones.
-- `3.Retos/` — Trabajos de corte.
+- `3.Retos/` — Retos de corte propuestos por el docente.
 - `4.ProyectoFinal/` — Código y documentación del proyecto final.
 - `README.md` — Este archivo.
 - `LICENSE` — Licencia del repositorio.
+
+Los paquetes de entrega (`*.zip`) y el binario compilado no se versionan: se regeneran con el `Makefile` de cada reto.
 
 **Contacto**
 
