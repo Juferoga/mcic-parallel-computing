@@ -56,3 +56,9 @@ Thumbs.db
 *.bak
 *.tmp
 *.temp
+
+# Reto 1: paquetes de entrega y binarios (regenerar con make)
+3.Retos/1.Reto/*.zip
+3.Retos/1.Reto/Reto1-*/
+3.Retos/1.Reto/pipeline_cnn
+3.Retos/1.Reto/presentacion-template-inicial*/
