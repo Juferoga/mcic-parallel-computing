@@ -50,6 +50,10 @@ cd pipeline && uv sync && uv run --with jupyter --with matplotlib jupyter lab ..
 
 ## Presentación
 
+En línea: **https://juferoga.github.io/mcic-parallel-computing/** (guion del presentador en `guion.html`). Se vuelve a
+publicar sola con cada push que toque `presentacion/`.
+
+
 ```bash
 cd datos && ./bajar.sh muestra.txt && curl -L -o gtfs/GTFS.zip https://gtfs.transmilenio.gov.co/GTFS.zip && cd ..
 gh api "repos/Fozzy3/parallel-computing-final/git/trees/main?recursive=1" > datos/arbol.json
