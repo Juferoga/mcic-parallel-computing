@@ -1,0 +1,45 @@
+name: Presentación en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["4.ProyectoFinal/presentacion/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 4.ProyectoFinal/presentacion
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: 4.ProyectoFinal/presentacion/package-lock.json
+      - run: npm ci
+      - run: npx vite build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: 4.ProyectoFinal/presentacion/dist
+
+  desplegar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - id: despliegue
+        uses: actions/deploy-pages@v4
