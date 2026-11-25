@@ -94,6 +94,10 @@ kbd { font-family: var(--mono); font-size: 0.78em; border: 1px solid var(--ud-bo
 #stage { position: fixed; inset: 0; z-index: 2; overflow: hidden; touch-action: none; }
 #world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
 #world.moviendo { will-change: transform; }
+/* La interfaz pesa menos que la diapositiva: algo translúcida siempre y casi transparente mientras la cámara vuela. */
+#hud-top > *, #hud-bottom { opacity: 0.82; transition: opacity 0.35s ease; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+#hud-top > *:hover, #hud-bottom:hover { opacity: 1; }
+body.en-vuelo #hud-top > *, body.en-vuelo #hud-bottom { opacity: 0.22; transition-duration: 0.2s; }
 
 /* ---------- Lienzo: islas de capítulo y recorrido (filetes rojos finos, como en la plantilla) ---------- */
 #ruta { position: absolute; overflow: visible; pointer-events: none; left: 0; top: 0; width: 1px; height: 1px; }

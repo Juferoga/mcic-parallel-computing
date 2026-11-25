@@ -94,6 +94,7 @@ function volar(dest, duracion) {
   const p = { t: 0 };
   const dur = reducido ? 0.01 : duracion ?? Math.min(2.2, 0.9 + dist / 5000 + Math.abs(Math.log(a.z / dest.z)) * 0.25);
   world.classList.add("moviendo");
+  document.body.classList.add("en-vuelo");
   vuelo = gsap.to(p, {
     t: 1,
     duration: dur,
@@ -108,6 +109,7 @@ function volar(dest, duracion) {
     },
     onComplete() {
       world.classList.remove("moviendo");
+      document.body.classList.remove("en-vuelo");
     },
   });
 }
