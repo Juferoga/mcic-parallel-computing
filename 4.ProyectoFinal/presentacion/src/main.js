@@ -3,7 +3,7 @@
 // se agrupan en islas sobre el lienzo y un filete rojo fino une los marcos en el orden del recorrido.
 import "./style.css";
 import gsap from "gsap";
-import { iniciarFondo } from "./fondo.js";
+import { iniciarCiudad } from "./ciudad.js";
 import { graficos } from "./graficos.js";
 import { escenas } from "./tres.js";
 import datos from "./datos.json";
@@ -49,7 +49,11 @@ for (const f of frames) {
 
 // ---------- camera ----------
 const cam = { x: 0, y: 0, z: 1, r: 0 };
-const fondo = iniciarFondo(document.getElementById("fondo"));
+const fondo = iniciarCiudad(document.getElementById("fondo"), document.getElementById("buses"), (() => {
+  const xs = frames.flatMap((f) => [f.x - (W * f.s) / 2, f.x + (W * f.s) / 2]);
+  const ys = frames.flatMap((f) => [f.y - (H * f.s) / 2, f.y + (H * f.s) / 2]);
+  return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+})());
 
 function vista() {
   return { w: innerWidth, h: innerHeight - 120 }; // room for the HUD bars
@@ -257,30 +261,7 @@ function tramo(A, B) {
   return "M" + pts.map((p) => p.join(",")).join(" L");
 }
 
-// Mapa de Bogotá (las 108 rutas troncales del GTFS) en el mismo lienzo que los marcos: se acerca y se aleja con la
-// cámara, y en la vista general se ve completo y centrado detrás de todo el recorrido. Norte a la derecha.
-function mapaBogota() {
-  const xs = frames.flatMap((f) => [f.x - (W * f.s) / 2, f.x + (W * f.s) / 2]);
-  const ys = frames.flatMap((f) => [f.y - (H * f.s) / 2, f.y + (H * f.s) / 2]);
-  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
-  const pts = datos.troncales.flatMap((t) => t.p);
-  const la = pts.map((p) => p[1]), lo = pts.map((p) => p[0]);
-  const [la0, la1, lo0, lo1] = [Math.min(...la), Math.max(...la), Math.min(...lo), Math.max(...lo)];
-  const k = Math.min((x1 - x0 + 500) / (la1 - la0), (y1 - y0 + 500) / (lo1 - lo0));
-  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, mla = (la0 + la1) / 2, mlo = (lo0 + lo1) / 2;
-  const a = ([lon, lat]) => `${Math.round(cx + (lat - mla) * k)},${Math.round(cy + (lon - mlo) * k)}`;
-  const d = datos.troncales.map((t) => "M" + t.p.map(a).join("L"));
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.id = "mapa-bog";
-  svg.setAttribute("aria-hidden", "true");
-  const fy = y1 + 120;
-  svg.innerHTML = `<path class="via" d="${d.join("")}"/>` +
-    `<text class="mapa-rotulo" x="${x0}" y="${fy}">Bogotá D.C. · rutas troncales de TransMilenio (GTFS) · norte →</text>`;
-  world.prepend(svg);
-}
-
 function decorar() {
-  mapaBogota();
   const svg = document.getElementById("ruta");
   const NS = "http://www.w3.org/2000/svg";
   let zonas = "", lineas = "";

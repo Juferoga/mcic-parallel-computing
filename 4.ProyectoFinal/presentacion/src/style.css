@@ -61,7 +61,6 @@
   --flotante: #ffffff;
   --zona-fondo: #ffffff;
   --zona-fondo-op: 0.16;
-  --mapa-via: #8F959D;
   --zona-borde: var(--ud-borde);
   --zona-texto: var(--ud-sable);
 
@@ -76,7 +75,6 @@
   --bg: #1F1D1E;
   --zona-fondo: #ffffff;
   --zona-fondo-op: 0.035;
-  --mapa-via: #77716F;
   --zona-borde: #4A4647;
   --zona-texto: #E4E2E2;
   --sombra-lienzo: rgba(0, 0, 0, 0.6);
@@ -91,16 +89,13 @@ a { color: var(--ud-azur); }
 code { font-family: var(--mono); font-size: 0.84em; background: #EEF2F6; padding: 0.04em 0.32em; border-radius: 4px; color: var(--texto); }
 kbd { font-family: var(--mono); font-size: 0.78em; border: 1px solid var(--ud-borde); border-bottom-width: 2px; border-radius: 4px; padding: 0.05em 0.42em; margin: 0 0.1em; background: var(--ud-claro); color: var(--texto); }
 
-#fondo { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; }
+#fondo, #buses { position: fixed; pointer-events: none; inset: 0; width: 100vw; height: 100vh; z-index: 0; }
 #parallax { display: none; }
 #stage { position: fixed; inset: 0; z-index: 2; overflow: hidden; touch-action: none; }
 #world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
 #world.moviendo { will-change: transform; }
 
 /* ---------- Lienzo: islas de capítulo y recorrido (filetes rojos finos, como en la plantilla) ---------- */
-#mapa-bog { position: absolute; overflow: visible; pointer-events: none; left: 0; top: 0; width: 1px; height: 1px; }
-#mapa-bog .via { fill: none; stroke: var(--mapa-via); stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
-#mapa-bog .mapa-rotulo { font-family: var(--titulo); font-size: 150px; font-weight: 700; fill: var(--mapa-via); }
 #ruta { position: absolute; overflow: visible; pointer-events: none; left: 0; top: 0; width: 1px; height: 1px; }
 #ruta .zona { fill: var(--zona-fondo); fill-opacity: var(--zona-fondo-op); stroke: var(--zona-borde); stroke-width: 4; }
 #ruta .zona-filete { fill: none; stroke: var(--ud-rojo); stroke-width: 4; stroke-opacity: 0.75; }

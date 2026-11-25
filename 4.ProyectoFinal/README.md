@@ -20,6 +20,7 @@ docs/
   evaluacion-archivador.md   revisión crítica del archivador y de la calidad de los datos
 presentacion/          presentación interactiva (Vite + three.js + GSAP), mismo motor que la de BI
   scripts/exportar_datos.py  genera src/datos.json a partir de datos/
+  scripts/exportar_mapa.py   genera src/mapa.json (calles con buses, troncales y estaciones del GTFS) para el fondo
   scripts/guion_datos.js     guion del presentador (se inserta en guion.html)
 pipeline/              pipeline en Ray (y su versión secuencial), métricas y scripts de Colab (ver pipeline/README.md)
 resultados/            tiempos.jsonl, benchmark.json y metricas.json de la corrida en Colab (24 nov 2026)
