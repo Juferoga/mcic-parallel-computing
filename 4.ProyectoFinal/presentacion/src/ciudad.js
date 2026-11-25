@@ -22,8 +22,11 @@ export function iniciarCiudad(cvMapa, cvBuses, caja) {
   const pct = (a, p) => a.sort((u, v) => u - v)[Math.floor(p * (a.length - 1))];
   const xmin = pct(lx, 0.02), xmax = pct(lx, 0.98), ymin = pct(ly, 0.02), ymax = pct(ly, 0.98);
   const mlo = lon0 + ((xmin + xmax) / 2) * q, mla = lat0 + ((ymin + ymax) / 2) * q;
-  const k = Math.min((caja.x1 - caja.x0 - 400) / ((ymax - ymin) * q), (caja.y1 - caja.y0 - 400) / ((xmax - xmin) * q));
-  const cx = (caja.x0 + caja.x1) / 2, cy = (caja.y0 + caja.y1) / 2;
+  // Cubre la caja de los marcos y se corre para que todos, también la portada en la esquina, tengan buses detrás.
+  // Escala y corrimiento elegidos buscando el máximo del mínimo de buses visibles alrededor de cada marco.
+  const AJUSTE = { k: 1.4, dx: -6400, dy: 400 };
+  const k = AJUSTE.k * Math.max((caja.x1 - caja.x0 + 1200) / ((ymax - ymin) * q), (caja.y1 - caja.y0 + 1200) / ((xmax - xmin) * q));
+  const cx = (caja.x0 + caja.x1) / 2 + AJUSTE.dx, cy = (caja.y0 + caja.y1) / 2 + AJUSTE.dy;
   const px = (lon, lat) => cx + (lat - mla) * k;
   const py = (lon, lat) => cy + (lon - mlo) * k;
 
