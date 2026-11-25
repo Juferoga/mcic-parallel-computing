@@ -1,0 +1,12 @@
+[project]
+name = "tm-ray"
+version = "0.1.0"
+description = "Pipeline en Ray sobre el archivo GTFS-Realtime de TransMilenio"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "ray[data]>=2.40",
+  "pyarrow>=15",
+  "pandas>=2.1",
+  "numpy>=1.26",
+  "gtfs-realtime-bindings>=1.0",
+]

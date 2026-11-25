@@ -1,0 +1,4 @@
+# capturas y GTFS bajados localmente (ver bajar.sh); no se versionan
+raw/
+gtfs/
+arbol.json

@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bogotá en movimiento · TransMilenio + Ray</title>
+  <meta name="description" content="Proyecto final de Computación Paralela: 14 días del GTFS-Realtime de TransMilenio procesados en paralelo con Ray." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="theme-color" content="#ECEEF1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Cambria y Times New Roman son las fuentes institucionales del contenido (Caladea y Tinos (libres, con las mismas métricas, las reemplazan donde no estén instaladas). Source Sans 3 se usa solo en los controles. -->
+  <link href="https://fonts.googleapis.com/css2?family=Caladea:ital,wght@0,400;0,700;1,400&family=Tinos:ital,wght@0,400;0,700;1,400&family=Cousine:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <canvas id="fondo" aria-hidden="true"></canvas>
+  <div id="parallax" aria-hidden="true"></div>
+
+  <main id="stage" aria-live="polite">
+    <div id="world">
+      <svg id="ruta" aria-hidden="true"></svg>
+
+      <!-- ============================== 0 · INICIO ============================== -->
+      <section class="frame portada" id="portada" data-x="0" data-y="0" data-cap="0" data-titulo="Portada">
+        <!-- Maqueta de la plantilla UD: portada_base.jpg ya trae el panel rojo con el escudo invertido y las flechas. -->
+        <div class="frame-in">
+          <h1 class="titulo-grande"><span class="linea">Bogotá en <em>movimiento</em></span> <span class="linea">14 días de TransMilenio,</span> <span class="linea">procesados en paralelo</span></h1>
+          <p class="kicker">Proyecto final · Computación Paralela · Módulo 9: Ray</p>
+          <hr class="regla" />
+          <p class="autores"><span>Juan Felipe Rodríguez Galindo <small>20261595004</small></span><span>Carlos Stiven Mora Hoyos <small>20261595003</small></span></p>
+          <p class="programa">Maestría en Ciencias de la Información y las Comunicaciones<br />Universidad Distrital Francisco José de Caldas</p>
+          <p class="docente">Docente: Nelson Enrique Vera Parra</p>
+          <p class="anio">2026</p>
+        </div>
+        <img src="img/LogoMCIC.png" alt="Logo MCIC" class="logo-mcic" />
+        <div class="como-navegar">
+          <span><kbd>→</kbd><kbd>espacio</kbd> o rueda: avanzar</span>
+          <span><kbd>←</kbd> retroceder</span>
+          <span><kbd>O</kbd> mapa de la ruta</span>
+          <span><kbd>N</kbd> notas</span>
+          <span><kbd>T</kbd> tema</span>
+        </div>
+        <aside class="nota">Bienvenida. La presentación es un recorrido: la línea avanza de estación en estación. Las líneas del fondo son las troncales reales de TransMilenio, sacadas del GTFS estático.</aside>
+      </section>
+
+      <section class="frame" id="pregunta" data-x="1950" data-y="0" data-cap="0" data-titulo="El caso">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>Cada ~30 segundos, TransMilenio publica dónde está cada uno de sus buses.</h2><p class="kicker">El caso</p></header>
+          <p class="lead">Desde el 4 de noviembre de 2026 el feed <b>GTFS-Realtime</b> es abierto. A las 7:00 de un martes hay <b class="num" data-dato="foto.n">5.359</b> buses reportando.</p>
+          <div class="dos-col">
+            <div class="tarjeta rojo paso" data-paso="1"><h3>El problema</h3><p>El feed es <b>solo en vivo</b>. TransMilenio no publica histórico: lo que nadie guarda, se pierde.</p></div>
+            <div class="tarjeta verde paso" data-paso="2"><h3>Lo que hicimos</h3><p>Lo archivamos desde el <b>11 de noviembre</b>: <b data-dato="archivo.archivos">44.363</b> capturas, <b data-dato="archivo.gb" data-fmt="dec2">4,07</b> GB. Es la única copia de esos días.</p></div>
+          </div>
+          <div class="concepto paso" data-paso="3">
+            <span class="etq">Pregunta del proyecto</span>
+            <p>¿Cómo anda la red <b>de verdad</b> (velocidad, regularidad, buses pegados) y <b>cuánto se gana</b> al procesar ese volumen en paralelo con Ray frente a hacerlo en un solo núcleo?</p>
+          </div>
+        </div>
+        <aside class="nota">Dos preguntas: una de dominio (movilidad) y otra del curso (paralelismo). La segunda es la que se evalúa; la primera le da sentido.</aside>
+      </section>
+
+      <section class="frame" id="agenda" data-x="3900" data-y="0" data-cap="0" data-titulo="La ruta">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>Cuatro estaciones</h2><p class="kicker">La ruta de hoy</p></header>
+          <div class="paradas">
+            <div class="parada-agenda paso" data-paso="1" style="--c:var(--azul-tm)"><i>1</i><b>Los datos</b><small>qué guardamos y cómo</small></div>
+            <div class="parada-agenda paso" data-paso="2" style="--c:var(--amarillo)"><i>2</i><b>Calidad</b><small>huecos, zombis, duplicados y un cruce que no cuadra</small></div>
+            <div class="parada-agenda paso" data-paso="3" style="--c:var(--verde-tm)"><i>3</i><b>Ray</b><small>el pipeline y qué parte es paralela</small></div>
+            <div class="parada-agenda paso" data-paso="4" style="--c:var(--tm-rojo)"><i>4</i><b>Resultados</b><small>replay, métricas y speedup</small></div>
+            <div class="parada-agenda paso" data-paso="5" style="--c:var(--gris)"><i>⌂</i><b>Cierre</b><small>límites y lecciones</small></div>
+          </div>
+        </div>
+        <aside class="nota">La barra inferior es la misma ruta: una parada por marco. El círculo grande marca dónde vamos.</aside>
+      </section>
+
+      <!-- ============================== 1 · DATOS ============================== -->
+      <section class="frame capitulo" id="c1" data-x="3900" data-y="1600" data-cap="1" data-titulo="Estación 1 · Los datos" style="--c:var(--azul-tm)">
+        <div class="frame-in">
+          <p class="cap-num">01</p>
+          <span class="letrero"><span class="ruta" style="--c:var(--azul-tm)">A</span>Los datos <small>ESTACIÓN 1</small></span>
+          <h2 class="cap-titulo">Los datos</h2>
+          <p class="lead">¿Qué guardamos?</p>
+          <div class="cifras">
+            <div><b data-dato="archivo.archivos">44.363</b><span>capturas</span></div>
+            <div><b data-dato="archivo.gb" data-fmt="dec2">4,07</b><span>GB comprimidos</span></div>
+            <div><b data-dato="archivo.dias">14</b><span>días</span></div>
+            <div><b data-dato="benchmark.volumen.1.filas.posiciones">85.210.105</b><span>reportes leídos (60,8 M útiles)</span></div>
+          </div>
+        </div>
+        <aside class="nota">La cifra de reportes es una estimación: cada bus da un dato nuevo cada ~52 s (medido) por los buses en servicio de cada media hora. Se confirma al correr el ETL completo.</aside>
+      </section>
+
+      <section class="frame" id="foto" data-x="5850" data-y="1600" data-cap="1" data-titulo="Bogotá a las 7:00" data-tres="foto">
+        <div class="frame-in dividido">
+          <header class="titulo-marco"><h2>Una sola captura: Bogotá a las 7:00</h2><p class="kicker">Estación 1 · Los datos</p></header>
+          <div class="texto">
+            <p>Martes 17 de noviembre, <b>07:00:44</b>. Cada punto es un bus que reportó en los últimos 5 minutos.</p>
+            <ul class="leyenda-3d">
+              <li><i class="dot troncal"></i> troncal · <i class="dot zonal"></i> zonal · <i class="dot alimentador"></i> alimentador · <i class="dot dual"></i> dual</li>
+              <li class="paso" data-paso="1">Columnas: buses por celda hexagonal de ~1 km (agregación espacial)</li>
+              <li class="paso" data-paso="2">Solo el sistema troncal: <b data-dato="foto.tipos.troncal">897</b> de <b data-dato="foto.n">5.359</b></li>
+            </ul>
+            <p class="muted">Arrastra para girar. Las líneas del piso son las troncales del GTFS estático.</p>
+          </div>
+          <div class="lienzo"><canvas data-canvas></canvas><div class="etiquetas-3d"></div></div>
+        </div>
+        <aside class="nota">La mayoría de buses son zonales (SITP), no troncales. Los reportes llegan con ~32 s de retraso en la mediana y ~46 s en el p90.</aside>
+      </section>
+
+      <section class="frame" id="mensaje" data-x="7800" data-y="1600" data-cap="1" data-titulo="Un reporte por dentro" data-grafico="mensaje">
+        <div class="frame-in dividido">
+          <header class="titulo-marco"><h2>Así se ve un reporte</h2><p class="kicker">Estación 1 · Los datos</p></header>
+          <div class="texto">
+            <p>Cada captura es un <code>FeedMessage</code> de protobuf con gzip. Este es un bus real del 18 de noviembre a las 8:07.</p>
+            <ol class="mini-conceptos">
+              <li class="paso" data-paso="1"><b>El viaje:</b> qué ruta y qué viaje está haciendo</li>
+              <li class="paso" data-paso="2"><b>Dónde y cuándo:</b> posición, parada y hora del reporte</li>
+              <li class="paso" data-paso="3"><b>Quién:</b> el vehículo</li>
+            </ol>
+            <div class="tarjeta rojo paso" data-paso="3"><p><b>No trae velocidad ni ocupación.</b> La velocidad hay que derivarla: ordenar por bus y por tiempo, y medir la distancia sobre la ruta.</p></div>
+          </div>
+<pre class="codigo"><code><span data-campo="1">trip {
+  trip_id: <span class="s">"TTABA0652.15.12462"</span>
+  start_time: <span class="s">"08:06:20"</span>
+  start_date: <span class="s">"20261118"</span>
+  route_id: <span class="s">"14053"</span>
+}</span><span data-campo="2">position {
+  latitude: <span class="n">4.67020082</span>
+  longitude: <span class="n">-74.0643234</span>
+}
+current_stop_sequence: <span class="n">9</span>
+stop_id: <span class="s">"61871"</span>
+timestamp: <span class="n">1795007180</span>  <span class="c"># 08:06:20 Bogotá</span></span><span data-campo="3">vehicle {
+  id: <span class="s">"10156"</span>
+  label: <span class="s">"D0156"</span>
+  license_plate: <span class="s">"TUO124"</span>
+}</span></code></pre>
+        </div>
+        <aside class="nota">Esto es lo que procesa el pipeline: ~5.500 de estos por captura, ~29.000 capturas.</aside>
+      </section>
+
+      <section class="frame grande" id="archivador" data-x="7800" data-y="2850" data-cap="1" data-titulo="Cómo se guardó" data-grafico="archivador">
+        <div class="frame-in">
+          <div class="aws-cabecera">
+            <header class="titulo-marco"><h2>Un archivador de 80 líneas de bash</h2><p class="kicker">Estación 1 · Los datos</p></header>
+            <p class="muted">Corre en un servidor de la Universidad Distrital desde el 11 de noviembre. Hecho por Carlos.</p>
+          </div>
+          <div class="diagrama" data-svg></div>
+          <div>
+            <div class="concepto"><span class="etq">Tolerancia a fallas</span><p>cron lo intenta arrancar cada minuto y <code>flock</code> deja una sola copia: si se cae o el servidor se reinicia, vuelve en menos de un minuto.</p></div>
+          </div>
+        </div>
+        <aside class="nota">Lo bueno: escritura atómica (.part → mv), reintentos y huecos documentados. El punto ciego es el paso 3, y lo vamos a ver en la estación 2.</aside>
+      </section>
+
+      <section class="frame" id="pordia" data-x="5850" data-y="2850" data-cap="1" data-titulo="Capturas por día" data-grafico="porDia">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>~300 MB por día, sin pausa</h2><p class="kicker">Estación 1 · Los datos</p></header>
+          <p class="lead">Capturas de posiciones por día (UTC). <span class="sw" style="background:var(--azul-tm)"></span> hábil · <span class="sw" style="background:var(--amarillo)"></span> fin de semana o festivo · <span class="sw rayas"></span> día incompleto</p>
+          <div class="grafico ancho" data-svg></div>
+          <p class="pie">Por eso no versionamos los datos dentro del repositorio del curso: git no es un almacén de datos y GitHub pone el límite blando en 5 GB.</p>
+        </div>
+        <aside class="nota">El 16 de noviembre fue festivo (lunes): se comporta como un domingo. El 20 y el 23 tienen menos capturas porque el feed se congeló en la mañana.</aside>
+      </section>
+
+      <!-- ============================== 2 · CALIDAD ============================== -->
+      <section class="frame capitulo" id="c2" data-x="3900" data-y="4600" data-cap="2" data-titulo="Estación 2 · Calidad" style="--c:var(--amarillo)">
+        <div class="frame-in">
+          <p class="cap-num">02</p>
+          <span class="letrero"><span class="ruta" style="--c:var(--amarillo)">B</span>Calidad <small>ESTACIÓN 2</small></span>
+          <h2 class="cap-titulo">Calidad</h2>
+          <p class="lead">¿Podemos confiar en los datos?</p>
+          <div class="cifras pequeñas">
+            <div><b>16 h</b><span>con buses «zombis» sin que el archivador lo notara</span></div>
+            <div><b data-dato="replay.duplicado_pct" data-fmt="pct1">16,8 %</b><span>de los reportes leídos son repetidos</span></div>
+            <div><b>2,6 %</b><span>de los viajes del 12 al 17 nov existen en el GTFS de hoy</span></div>
+          </div>
+        </div>
+        <aside class="nota">Tres hallazgos que no estaban documentados. Ninguno se ve sin abrir los archivos: hay que leer el contenido, no solo contar bytes.</aside>
+      </section>
+
+      <section class="frame grande" id="calor" data-x="5850" data-y="4600" data-cap="2" data-titulo="Mapa de huecos" data-grafico="calor">
+        <div class="frame-in">
+          <div class="aws-cabecera">
+            <header class="titulo-marco"><h2>Buses en servicio, cada media hora</h2><p class="kicker">Estación 2 · Calidad</p></header>
+            <div class="leyenda-linea"><span><span class="sw grad"></span> 0 → 7.000 buses</span><span><span class="sw rayas"></span> sin capturas</span></div>
+          </div>
+          <div class="aws-paso">
+            <b class="paso" data-paso="0">Hora de Bogotá. Cada fila es un día de servicio.</b>
+            <span class="paso" data-paso="1">① Del 18 a las 17:30 al 19 a las 10:00 el feed entregó siempre los mismos 7 buses, con reportes de hace semanas.</span>
+            <span class="paso" data-paso="2">② El 20 y el 23 el feed se congeló: falta el pico de la mañana.</span>
+            <span class="paso" data-paso="3">③ Días hábiles completos: 12, 13 y 17. Son los que usamos para comparar.</span>
+          </div>
+          <div class="grafico ancho" data-svg></div>
+        </div>
+        <aside class="nota">El hueco ① no aparece en el README del archivo. Pasa la carpeta del 18 al 19 porque el archivador nombra las carpetas en UTC: el día de servicio de Bogotá cruza dos carpetas.</aside>
+      </section>
+
+      <section class="frame" id="zombis" data-x="7800" data-y="4600" data-cap="2" data-titulo="Buses zombis">
+        <div class="frame-in dividido">
+          <header class="titulo-marco"><h2>Los buses zombis</h2><p class="kicker">Estación 2 · Calidad</p></header>
+          <div class="texto">
+            <p>19 de noviembre, 6:00 a. m., hora pico. La captura trae <b>7 vehículos</b>. Uno de ellos:</p>
+            <div class="tarjeta fila-tx"><p class="tx">Z40-4217 · CO14AG022.1.10843</p><p>Viaje que empezó el <b>6 de noviembre a las 23:59</b>. Su último reporte es de ese día: <b>13 días</b> de antigüedad.</p></div>
+            <div class="tarjeta rojo paso" data-paso="1"><p>El archivador compara <b>bytes</b>: como el encabezado cambia, guarda la captura como «nueva». Para él, el feed nunca se congeló.</p></div>
+          </div>
+          <div class="texto">
+            <div class="concepto paso" data-paso="2"><span class="etq">Regla de limpieza</span><p>Un reporte vale si <code>header.timestamp − vehicle.timestamp &lt; 300 s</code>. Con eso, una captura zombi queda en 0 buses y el hueco se ve.</p></div>
+<pre class="codigo paso" data-paso="2"><code><span class="c"># dentro de map_batches</span>
+edad = header_ts - df[<span class="s">"timestamp"</span>]
+df = df[edad &lt; <span class="n">300</span>]
+df = df.drop_duplicates(
+    [<span class="s">"vehicle_id"</span>, <span class="s">"timestamp"</span>])</code></pre>
+          </div>
+        </div>
+        <aside class="nota">El arreglo de fondo en el archivador es detectar el congelamiento por cantidad de buses frescos, no por el hash del archivo. Para el análisis basta con filtrar en el ETL.</aside>
+      </section>
+
+      <section class="frame" id="duplicados" data-x="7800" data-y="5850" data-cap="2" data-titulo="Duplicados" data-grafico="duplicados">
+        <div class="frame-in dividido">
+          <header class="titulo-marco"><h2>Leer más no es tener más</h2><p class="kicker">Estación 2 · Calidad</p></header>
+          <div class="texto">
+            <p>Se consulta cada 10–20 s, pero cada bus reporta un dato nuevo cada <b data-dato="volumen.intervalo_s" data-fmt="dec1">51,6</b> s en promedio. El mismo reporte sale en varias capturas seguidas.</p>
+            <div class="concepto"><span class="etq">Clave única</span><p>Un reporte es <code>(vehicle_id, timestamp)</code>. Deduplicar requiere ver capturas vecinas juntas: es una operación con <b>estado entre archivos</b>, no solo por archivo.</p></div>
+          </div>
+          <div class="grafico" data-svg></div>
+        </div>
+        <aside class="nota">Ventana del replay: 17 de noviembre de 6:15 a 7:45. Por eso la deduplicación va después del shuffle por vehículo, no en el parseo.</aside>
+      </section>
+
+      <section class="frame" id="union" data-x="5850" data-y="5850" data-cap="2" data-titulo="El cruce que no cuadra" data-grafico="union">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>Los viajes cambian de nombre cada día</h2><p class="kicker">Estación 2 · Calidad</p></header>
+          <p class="lead">Porcentaje de reportes cuyo identificador existe en el GTFS estático del 24 de noviembre.</p>
+          <div class="leyenda-linea"><span class="paso" data-paso="1"><span class="sw" style="background:var(--tm-rojo)"></span> <code>trip_id</code> (el viaje)</span><span class="paso" data-paso="2"><span class="sw" style="background:var(--verde-tm)"></span> <code>route_id</code> (la ruta)</span></div>
+          <div class="grafico ancho" data-svg></div>
+          <p class="pie paso" data-paso="2"><b>Decisión:</b> el horario programado (<code>stop_times</code>) solo sirve con el GTFS del mismo día, y ese se guarda desde el 24. El análisis va por <b>ruta y parada</b>, que sí cruzan (95–100 %).</p>
+          <p class="pie paso" data-paso="2"><b>Y otro:</b> hasta el 18 de noviembre a mediodía el feed no actualizaba el <code>stop_id</code> de cada bus (solo el 0,4 % de los reportes cambiaba de parada; después, ~40 %). Por eso el headway se mide en <b>puntos de control cada 1 km sobre la ruta</b>, con la distancia del map-matching.</p>
+        </div>
+        <aside class="nota">El salto del trip_id (2,6 % → 14 %) y el del stop_id ocurren el mismo día, el 18: TransMilenio cambió cómo arma el feed. TransMilenio publica un GTFS nuevo cada día y renombra los trip_id. Si no lo hubiéramos medido, el cruce con el horario habría salido vacío sin dar error.</aside>
+      </section>
+
+      <section class="frame" id="dias" data-x="3900" data-y="5850" data-cap="2" data-titulo="Qué días usamos">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>Qué días entran al análisis</h2><p class="kicker">Estación 2 · Calidad</p></header>
+          <div class="opciones">
+            <div class="opcion paso" data-paso="1" style="--c:var(--verde-tm)"><h3>Hábiles completos</h3><p>Base del análisis y del replay.</p><div class="dato"><b>12 · 13 · 17</b>jue · vie · mar</div></div>
+            <div class="opcion paso" data-paso="2" style="--c:var(--azul-tm)"><h3>Fin de semana y festivo</h3><p>Para comparar contra un día hábil.</p><div class="dato"><b>14 · 15 · 16 · 21 · 22</b>el 16 fue festivo</div></div>
+            <div class="opcion paso" data-paso="3" style="--c:var(--amarillo)"><h3>Parciales</h3><p>Entran al benchmark (volumen), no a las métricas de un día completo.</p><div class="dato"><b>18 · 19 · 20 · 23</b>zombis o congelados</div></div>
+            <div class="opcion paso" data-paso="4" style="--c:var(--gris)"><h3>Bordes</h3><p>El archivo empieza el 11 en la noche y el 24 sigue abierto.</p><div class="dato"><b>11 · 24</b>incompletos</div></div>
+          </div>
+        </div>
+        <aside class="nota">Para medir speedup sirve todo el volumen: el costo de cómputo no depende de que el día sea bueno. Para las métricas de movilidad solo entran los días completos.</aside>
+      </section>
+
+      <!-- ============================== 3 · RAY ============================== -->
+      <section class="frame capitulo" id="c3" data-x="3900" data-y="7600" data-cap="3" data-titulo="Estación 3 · Ray" style="--c:var(--verde-tm)">
+        <div class="frame-in">
+          <p class="cap-num">03</p>
+          <span class="letrero"><span class="ruta" style="--c:var(--verde-tm)">C</span>Ray <small>ESTACIÓN 3</small></span>
+          <h2 class="cap-titulo">Ray</h2>
+          <p class="lead">¿Qué parte del problema es paralela?</p>
+          <div class="cifras pequeñas">
+            <div><b data-dato="archivo.posiciones">28.958</b><span>archivos protobuf independientes</span></div>
+            <div><b>85 M</b><span>reportes que hay que reordenar por bus</span></div>
+            <div><b>45 MB</b><span>de geometrías de rutas (<code>shapes.txt</code>) contra las que se compara cada punto</span></div>
+          </div>
+        </div>
+        <aside class="nota">Cada cifra corresponde a un tipo de paralelismo distinto: datos independientes, un shuffle y un kernel de CPU con datos compartidos.</aside>
+      </section>
+
+      <section class="frame" id="porque" data-x="5850" data-y="7600" data-cap="3" data-titulo="Tres costos">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>Tres costos, tres formas de paralelizar</h2><p class="kicker">Estación 3 · Ray</p></header>
+          <div class="tres-col">
+            <div class="tarjeta azul paso" data-paso="1"><h3>Parsear</h3><p>29.000 archivos que no dependen entre sí. Descomprimir y decodificar es CPU.</p><p class="pie"><b>Paralelismo de datos</b>: tareas sin comunicación.</p></div>
+            <div class="tarjeta oro paso" data-paso="2"><h3>Reordenar</h3><p>Un archivo es una foto de todos los buses; para la velocidad hace falta la película de cada bus.</p><p class="pie"><b>Shuffle</b>: repartir por <code>hash(vehicle_id)</code>, mueve datos entre workers.</p></div>
+            <div class="tarjeta rojo paso" data-paso="3"><h3>Emparejar</h3><p>Cada punto se proyecta sobre la geometría de su ruta para medir distancia recorrida.</p><p class="pie"><b>Kernel caro</b> con un dato grande compartido: el object store.</p></div>
+          </div>
+          <div class="concepto paso" data-paso="4"><span class="etq">Ley de Amdahl</span><p>Si una fracción <b>p</b> del trabajo es paralela, con <b>n</b> workers el speedup no pasa de <code>1 / ((1 − p) + p / n)</code>. Leer de un solo disco y el shuffle son la parte que no escala igual.</p></div>
+        </div>
+        <aside class="nota">Esta es la diapositiva central para el curso: el problema no es «hacer todo en paralelo», sino reconocer qué tipo de paralelismo tiene cada etapa.</aside>
+      </section>
+
+      <section class="frame" id="modelo" data-x="7800" data-y="7600" data-cap="3" data-titulo="Las piezas de Ray">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>Las cuatro piezas de Ray que usamos</h2><p class="kicker">Estación 3 · Ray · conceptos del curso</p></header>
+          <div class="kpis">
+            <div class="kpi paso" data-paso="1"><span class="q">Tareas</span><div class="formula">@ray.remote<br/>def parsear(ruta): …</div><p>Funciones sin estado que corren en cualquier worker. Una por lote de archivos.</p></div>
+            <div class="kpi paso" data-paso="2"><span class="q">Object store</span><div class="formula">ref = ray.put(shapes)</div><p>Memoria compartida por nodo: las geometrías se suben una vez y todas las tareas las leen sin copiar.</p></div>
+            <div class="kpi paso" data-paso="3"><span class="q">Ray Data</span><div class="formula">ds.map_batches(f)<br/>.write_parquet(partition_cols=…)</div><p>Datasets en bloques, con streaming: no hace falta que los 85 M de filas quepan en memoria.</p></div>
+            <div class="kpi paso" data-paso="4"><span class="q">Actores</span><div class="formula">@ray.remote<br/>class Replay: …</div><p>Procesos con estado. Solo para lo que tiene estado de verdad, como el replay en vivo.</p></div>
+          </div>
+          <p class="pie paso" data-paso="4"><span class="sello no">evitamos</span> un actor por estación: miles de actores con poco estado gastan más en coordinación que en cómputo.</p>
+        </div>
+        <aside class="nota">La idea del «actor por estación» venía de una primera lluvia de ideas. La descartamos: agrupar por vehículo es una operación de datos, no de actores.</aside>
+      </section>
+
+      <section class="frame grande" id="pipeline" data-x="9750" data-y="7600" data-cap="3" data-titulo="El pipeline" data-grafico="pipeline">
+        <div class="frame-in">
+          <div class="aws-cabecera">
+            <header class="titulo-marco"><h2>El pipeline</h2><p class="kicker">Estación 3 · Ray</p></header>
+          </div>
+          <div class="diagrama" data-svg></div>
+          <div class="concepto-pila">
+            <div class="concepto" data-concepto="0"><span class="etq">Entrada</span><p>Las capturas tal como las dejó el archivador. Nunca se modifican: todo lo demás se puede volver a generar.</p></div>
+            <div class="concepto" data-concepto="1"><span class="etq">Paralelismo de datos</span><p>Cada archivo es un bloque. <code>map_batches</code> decodifica protobuf a tablas Arrow y aplica la regla de los 300 s.</p></div>
+            <div class="concepto" data-concepto="2"><span class="etq">Shuffle al escribir</span><p>El ETL escribe el Parquet particionado por día y por <code>hash(vehicle_id) % 64</code>: cada partición ya trae la película completa de sus buses. Luego, una <b>tarea de Ray Core</b> por partición la ordena, deduplica y calcula Δt y Δd.</p></div>
+            <div class="concepto" data-concepto="3"><span class="etq">Object store</span><p>Las geometrías se suben una vez con <code>ray.put</code>. El map-matching es la etapa más cara y la que más se beneficia de más núcleos.</p></div>
+            <div class="concepto" data-concepto="4"><span class="etq">Reducción</span><p>Agregados por tramo y hora: velocidad comercial, headway y bunching. Esta presentación lee esas salidas.</p></div>
+          </div>
+        </div>
+        <aside class="nota">Cada paso de este diagrama es una etapa que se mide por separado en el benchmark: así se ve qué parte escala y cuál no.</aside>
+      </section>
+
+      <section class="frame" id="workers" data-x="9750" data-y="8850" data-cap="3" data-titulo="Workers" data-grafico="workers">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>El parseo, con 1, 4 y 16 workers</h2><p class="kicker">Estación 3 · Ray · paralelismo de datos</p></header>
+          <p class="lead">Cada cuadro es un lote de capturas. Pulsa → para sumar workers.</p>
+          <div class="grafico ancho" data-svg></div>
+          <p class="pie">Ilustrativo: el tiempo ideal es T/n. En la práctica, leer del disco y arrancar las tareas ponen un piso (Amdahl).</p>
+        </div>
+        <aside class="nota">Esto es lo que hace Ray Data por debajo: reparte bloques entre workers y junta los resultados en Parquet.</aside>
+      </section>
+
+      <section class="frame" id="mapmatch" data-x="7800" data-y="8850" data-cap="3" data-titulo="Map-matching">
+        <div class="frame-in dividido">
+          <header class="titulo-marco"><h2>¿Cuánto avanzó el bus?</h2><p class="kicker">Estación 3 · Ray · el kernel caro</p></header>
+          <div class="texto">
+            <p>La distancia en línea recta entre dos reportes miente en las curvas. Cada punto se proyecta sobre la geometría de <b>su</b> ruta y se mide la distancia sobre la vía.</p>
+            <div class="concepto paso" data-paso="1"><span class="etq">Por qué es caro</span><p>60,8 M de puntos, cada uno contra los segmentos de su ruta. Es CPU pura y sin dependencias entre buses: escala con los núcleos.</p></div>
+            <div class="concepto paso" data-paso="2"><span class="etq">Por qué el object store</span><p>Sin <code>ray.put</code>, cada tarea serializaría los 45 MB de geometrías. Con la referencia, se copian una vez por nodo.</p></div>
+          </div>
+<pre class="codigo"><code><span class="c"># una vez</span>
+ref = ray.put(geometrias_por_ruta)
+
+<span class="k">def</span> emparejar(lote, geos):
+    g = geos[lote.route_id]
+    lote[<span class="s">"s"</span>] = g.project(lote.puntos)
+    <span class="k">return</span> lote
+
+ds = ds.map_batches(
+    emparejar,
+    fn_kwargs={<span class="s">"geos"</span>: ref},
+    batch_format=<span class="s">"pandas"</span>)</code></pre>
+        </div>
+        <aside class="nota">Esquema simplificado. La versión real agrupa por ruta para que cada lote use una sola geometría.</aside>
+      </section>
+
+      <section class="frame" id="speedup" data-x="5850" data-y="8850" data-cap="3" data-titulo="Speedup" data-grafico="speedup">
+        <div class="frame-in dividido">
+          <header class="titulo-marco"><h2>Cuánto se gana</h2><p class="kicker">Estación 3 · Ray · medición</p></header>
+          <div class="texto">
+            <p>Speedup = tiempo secuencial / tiempo con n workers. Eficiencia = speedup / n.</p>
+            <ul class="mini-conceptos">
+              <li class="paso" data-paso="1">La curva de Amdahl pone el techo según la fracción paralela.</li>
+              <li class="paso" data-paso="2">La línea roja es la medición del pipeline completo sobre un día hábil entero.</li>
+            </ul>
+            <div class="tarjeta oro"><p><b>Línea base honesta:</b> el speedup se mide contra el <b>mismo código en un solo proceso, sin Ray</b>, no contra Ray con 1 worker (que ya paga el costo de arrancar Ray).</p></div>
+            <div data-tabla-bench></div>
+          </div>
+          <div class="grafico" data-svg></div>
+        </div>
+        <aside class="nota">La p de Amdahl se despeja del speedup medido con el máximo de workers. Lo que no escala: arrancar Ray, leer del disco y escribir Parquet. Pasa el mouse por los puntos para ver tiempo y eficiencia.</aside>
+      </section>
+
+      <!-- ============================== 4 · RESULTADOS ============================== -->
+      <section class="frame capitulo" id="c4" data-x="3900" data-y="10600" data-cap="4" data-titulo="Estación 4 · Resultados" style="--c:var(--tm-rojo)">
+        <div class="frame-in">
+          <p class="cap-num">04</p>
+          <span class="letrero"><span class="ruta" style="--c:var(--tm-rojo)">D</span>Resultados <small>ESTACIÓN 4</small></span>
+          <h2 class="cap-titulo">Resultados</h2>
+          <p class="lead">¿Cómo anda la red de verdad?</p>
+        </div>
+        <aside class="nota">Primero el replay, para ver la red moverse; luego las métricas que salen del pipeline.</aside>
+      </section>
+
+      <section class="frame" id="replay" data-x="5850" data-y="10600" data-cap="4" data-titulo="Replay 6:15 → 7:45" data-tres="replay">
+        <div class="frame-in dividido">
+          <header class="titulo-marco"><h2>Hora y media de la mañana, en 45 segundos</h2><p class="kicker">Estación 4 · Resultados</p></header>
+          <div class="texto">
+            <p>Martes 17 de noviembre, 6:15 a 7:45. <b data-dato="replay.n_buses">1.600</b> buses con su trayectoria real, a 120× la velocidad real. La estela muestra los últimos ~2 minutos.</p>
+            <ul class="leyenda-3d">
+              <li><i class="dot troncal"></i> troncal · <i class="dot zonal"></i> zonal · <i class="dot alimentador"></i> alimentador · <i class="dot dual"></i> dual</li>
+              <li class="paso" data-paso="1">Solo troncales: se ven los corredores exclusivos</li>
+            </ul>
+            <p class="muted">Arrastra para girar. Un bus desaparece si deja de reportar por más de 4 minutos.</p>
+          </div>
+          <div class="lienzo">
+            <canvas data-canvas></canvas><div class="etiquetas-3d"></div>
+            <div class="hud-3d"><b class="grande" data-reloj>06:15</b><span><b data-activos>0</b> buses en pantalla</span></div>
+            <button class="btn-3d" data-pausa>❚❚ pausa</button>
+          </div>
+        </div>
+        <aside class="nota">Son los datos crudos, interpolados entre reportes. No depende de que el feed esté en línea el día de la presentación.</aside>
+      </section>
+
+      <section class="frame" id="metricas" data-x="7800" data-y="10600" data-cap="4" data-titulo="Métricas">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>Tres métricas del gemelo digital</h2><p class="kicker">Estación 4 · Resultados</p></header>
+          <div class="metricas">
+            <div class="metrica paso" data-paso="1" style="--c:var(--azul-tm)"><h3>Velocidad comercial</h3><div class="formula">Δs sobre la ruta / Δt<br/>por tramo y hora</div><p>Incluye paradas y semáforos: es la que siente el pasajero.</p><span class="valor"><b data-dato="metricas.velocidad_pico_habil" data-fmt="dec1">—</b> <small>km/h en el pico (6–8 h, días hábiles)</small></span></div>
+            <div class="metrica paso" data-paso="2" style="--c:var(--amarillo)"><h3>Headway real</h3><div class="formula">t(bus i+1) − t(bus i)<br/>al cruzar el mismo punto<br/>de control (cada 1 km)</div><p>Cada cuánto pasa de verdad un bus de esa ruta.</p><span class="valor"><b data-dato="metricas.headway_mediana_min" data-fmt="dec1">—</b> <small>min de mediana entre buses de la misma ruta</small></span></div>
+            <div class="metrica paso" data-paso="3" style="--c:var(--tm-rojo)"><h3>Bus bunching</h3><div class="formula">headway &lt; 25 % de la<br/>mediana de esa ruta<br/>en ese punto</div><p>Buses pegados: uno lleno y el de atrás vacío.</p><span class="valor"><b data-dato="metricas.bunching_pct" data-fmt="pct1">—</b> <small>de los intervalos son buses pegados</small></span></div>
+          </div>
+        </div>
+        <aside class="nota">Valores de los días hábiles completos (12, 13 y 17 de noviembre). Sin trip_id del mismo día, el headway y el bunching se miden contra la mediana observada de cada ruta y parada, no contra el horario.</aside>
+      </section>
+
+      <section class="frame" id="velocidad" data-x="9750" data-y="10600" data-cap="4" data-titulo="Velocidad por hora" data-grafico="velhora">
+        <div class="frame-in dividido">
+          <header class="titulo-marco"><h2>¿A qué velocidad anda la red?</h2><p class="kicker">Estación 4 · Resultados</p></header>
+          <div class="texto">
+            <p>Velocidad comercial (distancia sobre la ruta ÷ tiempo, con paradas incluidas) por hora, en los días hábiles completos.</p>
+            <div class="por-dia paso" data-paso="1"><h3 class="sub">Velocidad comercial de cada día, 6–20 h</h3><div data-por-dia></div></div>
+          </div>
+          <div class="grafico" data-svg></div>
+        </div>
+        <aside class="nota">La troncal va más rápido porque tiene carril exclusivo; el zonal comparte la calle con el tráfico mixto. La caída en el pico es el trancón. Los fines de semana y el festivo van más rápido.</aside>
+      </section>
+
+      <section class="frame" id="tramos" data-x="11700" data-y="10600" data-cap="4" data-titulo="Dónde se frena" data-tres="velocidades">
+        <div class="frame-in dividido">
+          <header class="titulo-marco"><h2>Dónde se frena la troncal</h2><p class="kicker">Estación 4 · Resultados · gemelo digital</p></header>
+          <div class="texto">
+            <p>Cada columna es un tramo de 500 m de una ruta troncal, en el pico de la mañana (6–8 h) de los días hábiles. Más rojo, más lento.</p>
+            <p class="paso" data-paso="1">Los tramos lentos se levantan: la altura es cuánto les falta para llegar a 25 km/h.</p>
+            <ol class="mini-conceptos lentos paso" data-paso="1" data-lentos></ol>
+          </div>
+          <div class="lienzo"><canvas data-canvas></canvas><div class="etiquetas-3d"></div></div>
+        </div>
+        <aside class="nota">Esto es lo que produce el map-matching: sin proyectar cada punto sobre su ruta no se podría hablar de tramos. Se excluyen la cabecera y el final de cada ruta, donde los buses esperan en el portal.</aside>
+      </section>
+
+      <!-- ============================== 5 · CIERRE ============================== -->
+      <section class="frame" id="limites" data-x="13650" data-y="10600" data-cap="5" data-titulo="Límites y lecciones">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>Lo que aprendimos</h2><p class="kicker">Cierre</p></header>
+          <div class="dos-col">
+            <div class="tarjeta">
+              <h3>Límites</h3>
+              <ol>
+                <li class="paso" data-paso="1">Dependemos de un solo servidor: si no captura, no hay dato.</li>
+                <li class="paso" data-paso="2">Los <code>trip_id</code> cambian a diario: el horario solo cruza con el GTFS del mismo día.</li>
+                <li class="paso" data-paso="3">El benchmark corre en una máquina; un clúster real cambiaría el costo del shuffle.</li>
+              </ol>
+            </div>
+            <div class="tarjeta verde">
+              <h3>Lecciones</h3>
+              <ol>
+                <li class="paso" data-paso="1">Validar el <b>contenido</b>, no los bytes.</li>
+                <li class="paso" data-paso="2">Medir el cruce antes de diseñar el análisis.</li>
+                <li class="paso" data-paso="3">Paralelizar cada etapa según su tipo: datos, shuffle o kernel.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <aside class="nota">Cada lección sale de algo que medimos, no de una suposición.</aside>
+      </section>
+
+      <section class="frame cierre" id="cierre" data-x="15600" data-y="10600" data-cap="5" data-titulo="Gracias">
+        <!-- Maqueta de la plantilla UD: cierre_base.jpg ya trae el escudo (versión línea) y la franja roja. -->
+        <div class="frame-in">
+          <div class="cierre-caja">
+            <h2>Gracias</h2>
+            <p class="lead">Preguntas y discusión</p>
+            <hr class="regla" />
+            <p class="autores"><span>Juan Felipe Rodríguez Galindo</span><span>Carlos Stiven Mora Hoyos</span></p>
+            <p class="programa">Maestría en Ciencias de la Información<br />y las Comunicaciones</p>
+            <p class="asignatura">Computación Paralela</p>
+          </div>
+          <div class="cierre-fuentes">
+            <p>Datos: TransMilenio S.A., GTFS y GTFS-Realtime abiertos (gtfs.transmilenio.gov.co) · Archivo de capturas: github.com/Fozzy3/parallel-computing-final</p>
+            <p>Presione <kbd>O</kbd> para ver el recorrido completo.</p>
+          </div>
+        </div>
+        <aside class="nota">Cierre. Si preguntan por el submódulo: el código va en el repo del curso y los datos se descargan aparte con datos/bajar.sh.</aside>
+      </section>
+    </div>
+  </main>
+
+  <!-- HUD -->
+  <header id="hud-top">
+    <div class="marca"><img src="img/ud/escudo_linea.svg" alt="Escudo de la Universidad Distrital" /><span>Computación Paralela · TransMilenio + Ray</span></div>
+    <div class="hud-centro"><span data-hud-cap></span><b data-hud-titulo></b></div>
+    <div class="hud-acciones">
+      <button data-accion="mapa" title="Vista general (O)">◎ ruta</button>
+      <button data-accion="notas" title="Notas (N)">✎ notas</button>
+      <button data-accion="tema" title="Tema (T)">◐</button>
+      <button data-accion="pantalla" title="Pantalla completa (F)">⛶</button>
+      <button data-accion="ayuda" title="Ayuda (?)">?</button>
+    </div>
+  </header>
+  <nav id="hud-bottom">
+    <button class="nav-btn" data-accion="anterior" aria-label="Anterior">←</button>
+    <div class="pista" data-pista></div>
+    <span class="contador" data-contador></span>
+    <button class="nav-btn" data-accion="siguiente" aria-label="Siguiente">→</button>
+  </nav>
+  <aside id="notas" hidden><span class="etq">Notas del presentador</span><p data-nota></p></aside>
+  <div id="ayuda" hidden>
+    <div class="ayuda-caja">
+      <h2>Cómo moverse</h2>
+      <ul>
+        <li><kbd>→</kbd> <kbd>espacio</kbd> rueda: siguiente paso</li>
+        <li><kbd>←</kbd>: anterior</li>
+        <li><kbd>O</kbd>: ver toda la ruta · clic en un marco para ir</li>
+        <li><kbd>N</kbd>: notas · <kbd>T</kbd>: tema claro/oscuro · <kbd>F</kbd>: pantalla completa</li>
+        <li><kbd>G</kbd>: abrir el guion en otra ventana</li>
+        <li><kbd>1</kbd>…<kbd>4</kbd>: ir a cada estación</li>
+      </ul>
+      <button data-accion="ayuda">Entendido</button>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

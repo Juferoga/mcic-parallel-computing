@@ -1,0 +1,80 @@
+{
+ "maquina": "Google Colab · CPU High-RAM · 8 vCPU",
+ "dia": "2026-11-17",
+ "dia_etq": "martes 17 de noviembre",
+ "archivos": 2268,
+ "mb": 323.6,
+ "filas": {
+  "posiciones": 7515344,
+  "trayectorias": 5573076,
+  "headways": 11594
+ },
+ "secuencial": {
+  "etl": 32.74,
+  "trayectorias": 540.13,
+  "headways": 6.25,
+  "total": 579.12
+ },
+ "ray": [
+  {
+   "workers": 1,
+   "etl": 49.35,
+   "trayectorias": 553.87,
+   "headways": 7.01,
+   "total": 610.23
+  },
+  {
+   "workers": 2,
+   "etl": 39.84,
+   "trayectorias": 309.8,
+   "headways": 4.46,
+   "total": 354.1
+  },
+  {
+   "workers": 4,
+   "etl": 19.89,
+   "trayectorias": 147.74,
+   "headways": 3.1,
+   "total": 170.73
+  },
+  {
+   "workers": 8,
+   "etl": 17.35,
+   "trayectorias": 104.28,
+   "headways": 2.88,
+   "total": 124.51
+  }
+ ],
+ "volumen": [
+  {
+   "dias": 3,
+   "archivos": 6797,
+   "mb": 992.5,
+   "workers": 8,
+   "etl": 44.7,
+   "trayectorias": 292.8,
+   "headways": 4.82,
+   "total": 342.32,
+   "filas": {
+    "posiciones": 22824679,
+    "trayectorias": 16965213,
+    "headways": 35465
+   }
+  },
+  {
+   "dias": 14,
+   "archivos": 28958,
+   "mb": 3708.5,
+   "workers": 8,
+   "etl": 154.85,
+   "trayectorias": 1088.77,
+   "headways": 18.5,
+   "total": 1262.12,
+   "filas": {
+    "posiciones": 85210105,
+    "trayectorias": 60808419,
+    "headways": 12342215
+   }
+  }
+ ]
+}

@@ -1,0 +1,19 @@
+2026-11-24T19:05:48Z preparando
+2026-11-24T19:05:49Z datos listos: 7.7G
+2026-11-24T19:15:28Z fin --dias 2026-11-17 --out /content/tmp --modo secuencial --cpus 1 --etiqueta fuerte (rc=0)
+2026-11-24T19:25:46Z fin --dias 2026-11-17 --out /content/tmp --modo ray --cpus 1 --etiqueta fuerte (rc=0)
+2026-11-24T19:31:51Z fin --dias 2026-11-17 --out /content/tmp --modo ray --cpus 2 --etiqueta fuerte (rc=0)
+2026-11-24T19:34:55Z fin --dias 2026-11-17 --out /content/tmp --modo ray --cpus 4 --etiqueta fuerte (rc=0)
+2026-11-24T19:37:13Z fin --dias 2026-11-17 --out /content/tmp --modo ray --cpus 8 --etiqueta fuerte (rc=0)
+2026-11-24T19:43:15Z fin --dias 2026-11-12,2026-11-13,2026-11-17 --out /content/tmp --modo ray --cpus 8 --etiqueta volumen (rc=0)
+2026-11-24T20:04:55Z fin --dias 2026-11-11,2026-11-12,2026-11-13,2026-11-14,2026-11-15,2026-11-16,2026-11-17,2026-11-18,2026-11-19,2026-11-20,2026-11-21,2026-11-22,2026-11-23,2026-11-24 --out /content/completo --modo ray --cpus 8 --etiqueta volumen (rc=0)
+2026-11-24T20:05:15Z metricas rc=0
+2026-11-24T20:05:15Z TERMINADO
+2026-11-24T20:12:37Z fin hw --dias 2026-11-17 --out /content/d17 --modo secuencial --cpus 1 --etiqueta fuerte-hw (rc=0)
+2026-11-24T20:12:54Z fin hw --dias 2026-11-17 --out /content/d17 --modo ray --cpus 1 --etiqueta fuerte-hw (rc=0)
+2026-11-24T20:13:09Z fin hw --dias 2026-11-17 --out /content/d17 --modo ray --cpus 2 --etiqueta fuerte-hw (rc=0)
+2026-11-24T20:13:22Z fin hw --dias 2026-11-17 --out /content/d17 --modo ray --cpus 4 --etiqueta fuerte-hw (rc=0)
+2026-11-24T20:13:36Z fin hw --dias 2026-11-17 --out /content/d17 --modo ray --cpus 8 --etiqueta fuerte-hw (rc=0)
+2026-11-24T20:14:11Z fin hw --dias 2026-11-11 --out /content/completo --modo ray --cpus 8 --etiqueta volumen-hw (rc=0)
+2026-11-24T20:14:32Z metricas rc=0
+2026-11-24T20:14:32Z TERMINADO-HW
