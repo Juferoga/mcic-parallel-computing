@@ -50,7 +50,7 @@ cd pipeline && uv sync && uv run --with jupyter --with matplotlib jupyter lab ..
 
 ## Presentación
 
-En línea: **https://juferoga.github.io/mcic-parallel-computing/** (guion del presentador en `guion.html`). Se vuelve a
+En línea: **https://juferoga.github.io/mcic-parallel-computing/**. Se vuelve a
 publicar sola con cada push que toque `presentacion/`.
 
 
