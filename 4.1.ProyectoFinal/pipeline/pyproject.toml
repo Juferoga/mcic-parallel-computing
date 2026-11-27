@@ -1,0 +1,20 @@
+[project]
+name = "tm-tramos"
+version = "0.1.0"
+description = "Dónde pierden tiempo los buses de Bogotá: velocidad y retraso por tramo con Ray sobre el GTFS-RT de TransMilenio"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "ray[data]>=2.40",
+  "pyarrow>=15",
+  "pandas>=2.1",
+  "numpy>=1.26",
+  "gtfs-realtime-bindings>=1.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+# proyecto 3 (accesibilidad): r5py necesita Java (JDK 21+); uv sync --group acceso
+acceso = ["r5py>=1.1"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

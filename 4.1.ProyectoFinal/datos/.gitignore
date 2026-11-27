@@ -1,0 +1,8 @@
+# capturas y GTFS bajados localmente (ver bajar.sh); no se versionan
+raw/
+gtfs/
+arbol.json
+salida/
+dia*.txt
+em2023/
+osm/
