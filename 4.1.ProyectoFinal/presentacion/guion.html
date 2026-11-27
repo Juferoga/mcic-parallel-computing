@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guion · Dónde pierden tiempo los buses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Tipografía institucional UD: Cambria (títulos) y Times New Roman (texto); Caladea y Tinos son sus equivalentes libres. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caladea:ital,wght@0,400;0,700;1,400&family=Tinos:ital,wght@0,400;0,700;1,400&family=Cousine:wght@400;700&display=swap">
+<style>
+/* Layout: a teleprompter. Left rail = the frames of the presentation in order; right = one block per keypress, the current one large. */
+:root {
+  --ink: #1f1d1e;        /* room-dark background (sable UD oscurecido) */
+  --panel: #2a2829;
+  --line: #3d3a3b;
+  --text: #eeeceb;       /* warm off-white, easy on the eyes */
+  --dim: #98999a;        /* plata UD */
+  --rojo: #ed3237;       /* rojo gules UD: the keypress cue */
+  --oro: #c9b062;        /* oro UD aclarado para fondo oscuro: stage directions */
+  --verde: #2fc07a;      /* sinople UD aclarado */
+  --display: Cambria, Caladea, Georgia, serif;
+  --read: "Times New Roman", Tinos, Times, serif;
+  --mono: Cousine, "Courier New", ui-monospace, Menlo, monospace;
+  --tam: 30px;           /* reading size, changed with A− / A+ */
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--ink); color: var(--text); font-family: var(--read); }
+.app { display: grid; grid-template-columns: 280px minmax(0, 1fr); height: 100%; }
+
+/* ---------- rail ---------- */
+.rail { border-right: 1px solid var(--line); padding-block: 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
+.rail h1 { font-family: var(--display); font-weight: 700; color: #fff; border-left: 4px solid var(--rojo); padding-left: 10px; font-size: 22px; line-height: 1.15; margin: 0; text-wrap: balance; }
+.rail .sub { color: var(--dim); font-size: 14px; margin: 4px 0 0; }
+.reloj { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 8px; }
+.reloj .t { font-family: var(--mono); font-size: 34px; font-variant-numeric: tabular-nums; line-height: 1; }
+.reloj .meta { font-size: 13px; color: var(--dim); }
+.reloj .meta b { color: var(--text); font-weight: 400; font-family: var(--mono); }
+.reloj .meta.tarde b { color: var(--rojo); }
+.fila-botones { display: flex; gap: 6px; flex-wrap: wrap; }
+button { font: inherit; color: var(--text); background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 6px 11px; cursor: pointer; font-size: 14px; }
+button:hover { border-color: var(--dim); }
+button:focus-visible { outline: 2px solid var(--oro); outline-offset: 2px; }
+button.primario { border-color: var(--rojo); }
+.marcos { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.marcos li button { width: 100%; text-align: left; border: 0; border-radius: 6px; padding: 7px 10px; display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: baseline; color: var(--dim); }
+.marcos li button .n { font-family: var(--mono); font-size: 12px; }
+.marcos li button .d { font-family: var(--mono); font-size: 12px; }
+.marcos li button.hecho { color: #a9b0bb; }
+.marcos li button.actual { background: var(--panel); color: var(--text); }
+.marcos li button.actual .n { color: var(--rojo); }
+.marcos li.cap { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--oro); padding: 12px 10px 4px; }
+.marco-titulo .quien { text-transform: none; letter-spacing: 0; font-family: var(--read); font-size: 14px; color: var(--rojo); }
+.sync { font-size: 13px; margin: 0; color: var(--dim); }
+.sync.ok { color: var(--verde); }
+.ayuda { font-size: 13px; color: var(--dim); line-height: 1.5; margin: 0; }
+kbd { font-family: var(--mono); font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; }
+
+/* ---------- script ---------- */
+.guion { overflow-y: auto; scroll-behavior: smooth; padding-block: 28px 40vh; padding-left: 40px; padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+.guion-in { max-width: 34em; display: grid; gap: 14px; font-size: var(--tam); }
+.marco-titulo { font-family: var(--mono); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin-top: 1.4em; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.marco-titulo:first-child { margin-top: 0; }
+.marco-titulo b { color: var(--text); font-weight: 700; letter-spacing: .06em; }
+.marco-titulo .pantalla { text-transform: none; letter-spacing: 0; color: var(--oro); font-family: var(--read); font-size: 14px; }
+.bloque { border-left: 3px solid transparent; padding: 10px 0 10px 18px; cursor: pointer; opacity: .38; transition: opacity .25s, border-color .25s; }
+.bloque:hover { opacity: .6; }
+.bloque.actual { opacity: 1; border-left-color: var(--rojo); }
+.bloque.siguiente { opacity: .6; }
+.bloque p { margin: 0; line-height: 1.5; font-size: 1em; }
+.bloque p + p { margin-top: .5em; }
+.bloque b { color: #fff; }
+.bloque .haz { display: block; font-style: italic; color: var(--oro); font-size: .62em; margin-top: .5em; }
+.pulsa { margin-top: .55em; display: inline-flex; gap: 8px; align-items: center; font-family: var(--mono); font-size: 13px; color: var(--dim); }
+.pulsa i { font-style: normal; color: var(--rojo); font-size: 16px; }
+.bloque.actual .pulsa { color: #c3c8d0; }
+.bloque.entrega { border-left-style: dashed; }
+.bloque.entrega .pulsa { color: var(--oro); }
+
+/* ---------- reference ---------- */
+.referencia { margin-top: 3em; display: grid; gap: 20px; font-size: 17px; }
+.referencia h2 { font-family: var(--display); font-weight: 700; font-size: 24px; margin: 0; }
+.cifras { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.cifras div { background: var(--panel); padding: 12px 14px; }
+.cifras b { display: block; font-family: var(--mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+.cifras span { color: var(--dim); font-size: 14px; }
+.preguntas { display: grid; gap: 10px; }
+.preguntas details { border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; background: var(--panel); }
+.preguntas summary { cursor: pointer; font-weight: 700; }
+.preguntas p { margin: 8px 0 0; line-height: 1.55; color: #cfd3da; }
+
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .rail { border-right: 0; border-bottom: 1px solid var(--line); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-height: 42vh; }
+  .marcos { display: none; }
+  .guion { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  :root { --tam: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .guion { scroll-behavior: auto; } .bloque { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="rail">
+    <div>
+      <h1>Guion completo</h1>
+      <p class="sub">Inicio, Ray y Confiabilidad: Juan Felipe · Datos, Atlas y Cierre: Carlos</p>
+    </div>
+    <div class="reloj">
+      <div class="t" id="tiempo">0:00</div>
+      <div class="meta" id="meta">Meta total: <b>—</b></div>
+      <div class="fila-botones">
+        <button class="primario" id="btn-reloj" type="button">Iniciar</button>
+        <button id="btn-cero" type="button">Reiniciar</button>
+      </div>
+    </div>
+    <div class="fila-botones" aria-label="Tamaño de letra">
+      <button id="btn-menos" type="button" aria-label="Letra más pequeña">A−</button>
+      <button id="btn-mas" type="button" aria-label="Letra más grande">A+</button>
+      <button id="btn-ant" type="button">← Atrás</button>
+      <button id="btn-sig" type="button">Siguiente →</button>
+    </div>
+    <ol class="marcos" id="marcos"></ol>
+    <p class="sync" id="sync">○ Sin conexión con la presentación. Ábrela en otra ventana de este mismo navegador.</p>
+    <p class="ayuda">Cada bloque es <b>una pulsación de <kbd>→</kbd></b> en la presentación. Aquí: <kbd>→</kbd> o <kbd>espacio</kbd> avanza, <kbd>←</kbd> retrocede, clic en un bloque para saltar. <span style="color:var(--oro)">Lo dorado</span> es lo que haces, no lo que dices.</p>
+  </aside>
+
+  <main class="guion" id="guion">
+    <div class="guion-in" id="guion-in"></div>
+    <section class="referencia guion-in" aria-label="Referencia rápida">
+      <h2>Cifras a la mano</h2>
+      <div class="cifras">
+        <div><b>12 → 23 nov 2026</b><span>12 días de servicio analizados</span></div>
+        <div><b>27.599 · 3,5 GB</b><span>capturas · tamaño comprimido</span></div>
+        <div><b>80,9 M → 23,0 M</b><span>posiciones → recorridos de tramo de 500 m</span></div>
+        <div><b>29,0 %</b><span>de las posiciones leídas son repetidas</span></div>
+        <div><b>~52 s · 49 s</b><span>cada cuánto reporta un bus · edad mediana del reporte</span></div>
+        <div><b>6.448 → 8.325</b><span>buses en la hora pico de un día hábil, antes y después del 18</span></div>
+        <div><b>57 min · 6 CPUs</b><span>corrida completa (etl 5, recorridos 32, tramos 1, confiabilidad 20 min)</span></div>
+        <div><b>+0,5 % · 8,4 %</b><span>sesgo · error mediano con buses sintéticos a 52 s</span></div>
+        <div><b>21,7 · 17,9 · 14,3</b><span>km/h troncal · dual · alimentador (oficial 2024: 25,2 · 19,8 · 17,5)</span></div>
+        <div><b>0,63 · 0,73</b><span>Spearman del ranking entre mitades: mixto · exclusivo</span></div>
+        <div><b>31.307 · 4.823</b><span>bus-horas perdidas por día hábil: mixto · exclusivo</span></div>
+        <div><b>96,1 · 69,9</b><span>bus-h/día de la celda 1: mixto · exclusivo</span></div>
+        <div><b>0,17–0,21</b><span>BTI mediano en el pico, según sistema</span></div>
+        <div><b>87,3 %</b><span>cobertura walk-forward del p95 (meta 95 %)</span></div>
+      </div>
+      <h2>Si el profe pregunta…</h2>
+      <div class="preguntas">
+        <details><summary>¿Por qué Ray y no un script?</summary><p>Cada archivo, cada partición de buses y cada cubo de rutas se procesan sin depender de los demás, y el map-matching es CPU pura. El archivo cabe en una máquina: el argumento no es el volumen, es el costo por punto y la independencia. Igual medimos contra el mismo código en un solo proceso.</p></details>
+        <details><summary>¿Qué es el flujo libre?</summary><p>El p5 de la duración de cada tramo en todo el periodo, como en Aemmer et al. (2022). El retraso de un recorrido es su duración menos ese p5, nunca negativo.</p></details>
+        <details><summary>¿Por qué bus-horas y no pasajeros?</summary><p>El feed no trae ocupación ni conteos. El ranking suma el retraso de los buses, no el de las personas.</p></details>
+        <details><summary>¿Por qué el emparejamiento por sentido de marcha?</summary><p>Cada ruta tiene un solo shape que va y vuelve, muchas veces por la misma calle. Sin el sentido, un bus de vuelta se proyecta sobre la ida y la distancia recorrida sale mal.</p></details>
+        <details><summary>¿Los carriles de la Séptima funcionan?</summary><p>No lo podemos decir: no hay datos de antes del carril. Solo comparamos, en las mismas rutas y días, los tramos dentro y fuera del carril. Es descriptivo.</p></details>
+        <details><summary>¿Por qué el walk-forward da 87 % y no 95 %?</summary><p>El p95 se entrena con 4 días hábiles y se prueba con 3. Con tan pocos días el p95 de cada par y hora es inestable; es una causa probable, no probada. Lo reportamos tal cual.</p></details>
+        <details><summary>¿Por qué más buses desde el 18?</summary><p>Lo vemos en el feed: desde ese día reporta más vehículos. No sabemos si cambió la flota o la forma de armar el feed. La prueba de estabilidad del ranking compara justo esas dos mitades: antes y después del 18.</p></details>
+        <details><summary>¿Y los headways o el bunching?</summary><p>Quedan fuera a propósito: son el tema de la tesis.</p></details>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+// Guion de la presentación: un bloque por pulsación de → (bloques = pasos del marco + 1).
+// Va copiado tal cual dentro de guion.html. quien: "Juan Felipe" o "Carlos".
+const JF = "Juan Felipe", CO = "Carlos";
+const GUION = [
+  { id: "portada", cap: "Inicio", quien: JF, marco: "Portada", pantalla: "portada UD: título y autores", meta: 25, bloques: [
+    { t: ["Buenas, profesor y compañeros. Somos <b>Juan Felipe Rodríguez</b> y <b>Carlos Mora</b>.",
+          "Nuestro proyecto final responde una pregunta concreta: <b>dónde pierden tiempo los buses de Bogotá</b>. Lo hicimos con doce días del feed de TransMilenio procesados en <b>Ray</b>."],
+      haz: "Los puntos del fondo son buses reales del lunes 23, de 5 a 6:30 de la tarde.", pulsa: "va a «El problema»" },
+  ]},
+  { id: "problema", quien: JF, marco: "El problema", pantalla: "26,8 → 24,9 km/h · gráfico por hora", meta: 60, bloques: [
+    { t: ["Los buses de Bogotá van cada año más lento. La velocidad zonal en el pico de la mañana pasó de <b>26,8 a 24,9 km/h</b> entre 2023 y 2024, y la demanda zonal también cayó.",
+          "A la derecha está lo que medimos nosotros: en el pico el zonal y el alimentador andan entre <b>13 y 16 km/h</b>."], pulsa: "aparece «Sin mapa público»" },
+    { t: ["El problema es que la ciudad decide dónde poner carriles exclusivos o prioridad semafórica <b>sin un mapa público</b> de dónde y a qué hora se frenan los buses."], pulsa: "aparece la pregunta" },
+    { t: ["Entonces la pregunta es: ¿<b>dónde y cuándo</b> pierden tiempo los buses, y <b>cuánto hay que reservar</b> para llegar a tiempo?"], pulsa: "va a otras ciudades" },
+  ]},
+  { id: "ciudades", quien: JF, marco: "Otras ciudades", pantalla: "Nueva York · California · Santiago · Filadelfia", meta: 70, bloques: [
+    { t: ["Esto no es nuevo en otras ciudades."], pulsa: "Nueva York" },
+    { t: ["En <b>Nueva York</b> la MTA publica la velocidad por tramo y hora, y el Contralor la usa para calificar líneas: <b>186 de 332</b> sacaron D o F."], pulsa: "California" },
+    { t: ["En <b>California</b>, Cal-ITP hace lo mismo solo con GTFS-Realtime archivado, como nosotros. Desde abril de 2026 es la métrica oficial para evaluar la prioridad semafórica."], pulsa: "Santiago" },
+    { t: ["<b>Santiago</b> aporta lo causal: los corredores segregados y fiscalizados suben la velocidad cerca de un <b>20 %</b> en punta; la pintura sola no muestra efecto."], pulsa: "Filadelfia" },
+    { t: ["Y <b>Filadelfia</b> comparó un tramo con carril rojo contra uno gemelo sin pintura.",
+          "Bogotá abrió su feed el 4 de noviembre, pero nadie analiza el archivo histórico. Ese es el hueco."], pulsa: "estación 1: los datos" },
+  ]},
+  { id: "datos", cap: "Datos y Ray", quien: CO, marco: "Los datos y su calidad", pantalla: "mapa de calor de buses por hora", meta: 70, bloques: [
+    { t: ["Usamos <b>doce días</b>, del 12 al 23 de noviembre: unas <b>27.600 capturas</b> y <b>80,9 millones</b> de posiciones.",
+          "Casi un <b>30 %</b> de lo que se lee es repetido: el feed se consulta más seguido de lo que cada bus reporta, que es más o menos cada 52 segundos.",
+          "Lo rayado son horas sin reportes: el feed se congeló la noche del 18 y las mañanas del 19, 20 y 23."], pulsa: "marca ①" },
+    { t: ["Ojo con esto: desde el <b>18 de noviembre</b> el feed trae muchos más buses. En la hora pico de un día hábil pasamos de unos <b>6.400</b> a unos <b>8.300</b>. Es un cambio del feed, no de la ciudad."], pulsa: "marca ②" },
+    { t: ["Y los sábados, domingos y el festivo del 16 se analizan aparte, por tipo de día. Los rankings usan solo días hábiles."], pulsa: "va al pipeline" },
+  ]},
+  { id: "pipeline", quien: JF, marco: "El pipeline en Ray", pantalla: "diagrama de cajas", meta: 90, bloques: [
+    { t: ["El pipeline tiene cuatro etapas y cada una se mide por separado. Entra el archivo crudo, que nunca se toca."], pulsa: "Ray Data" },
+    { t: ["Primera etapa, <b>Ray Data</b>: un archivo no depende de otro, así que es paralelismo de datos puro. Se decodifica el protobuf, se quitan los zombis y se escribe Parquet partido por día y por un hash del bus."], pulsa: "Ray Core" },
+    { t: ["Segunda, la cara: <b>tareas de Ray Core</b>, una por día y partición, con las geometrías en el <b>object store</b>.",
+          "Lo nuevo: cada ruta tiene un solo shape de ida y vuelta, así que el bus se empareja solo con los segmentos que van <b>en su sentido de marcha</b>. Si no, la ida y la vuelta por la misma calle se confunden."], pulsa: "tramos y confiabilidad" },
+    { t: ["Tercera y cuarta: <b>tramos</b> y <b>confiabilidad</b>, una tarea por cubo de rutas. Los recorridos ya salen repartidos así, entonces no hay otro shuffle."], pulsa: "salida" },
+    { t: ["Resultado: de 80,9 millones de posiciones salen <b>23 millones</b> de recorridos de tramo. La corrida completa tarda <b>57 minutos</b> con 6 CPUs."], pulsa: "va a validación" },
+  ]},
+  { id: "validacion", quien: JF, marco: "Validación", pantalla: "tres tarjetas", meta: 75, bloques: [
+    { t: ["Antes de mostrar resultados, ¿le podemos creer a la medición? Tres pruebas."], pulsa: "error sintético" },
+    { t: ["Uno: buses sintéticos de velocidad conocida, muestreados cada 52 segundos. El sesgo es de <b>medio punto</b> porcentual y el error mediano, <b>8,4 %</b> por tramo."], pulsa: "cifra oficial" },
+    { t: ["Dos: contra la cifra oficial de 2024 medimos entre un <b>10 y un 18 % menos</b>. Mismo orden de magnitud, pero más bajo, y lo decimos así."], pulsa: "estabilidad" },
+    { t: ["Tres: si partimos los días hábiles en dos mitades, el ranking se parece: Spearman de <b>0,63</b> en tráfico mixto y <b>0,73</b> en exclusivo. Estable, no idéntico."], pulsa: "va a speedup" },
+  ]},
+  { id: "speedup", quien: JF, marco: "Speedup y Amdahl", pantalla: "curva de speedup", meta: 70, bloques: [
+    { t: ["Ahora la parte del curso. El speedup se mide contra el <b>mismo código en un solo proceso</b>, sin Ray. No contra Ray con un worker, que ya paga el costo de arrancar Ray."], pulsa: "aparece Amdahl" },
+    { t: ["La curva de Amdahl pone el techo: si una fracción p es paralela, con n núcleos no se gana más que uno sobre (1 − p) + p/n."], pulsa: "aparece la medición" },
+    { t: ["Y esta es la medición, el mismo día hábil con 1, 2, 4 y 8 workers. De ahí sale la p estimada.",
+          "Si la corrida todavía no está, en pantalla dice «medición pendiente»: no inventamos la curva."], haz: "Pasa el mouse por los puntos para leer tiempo y eficiencia.", pulsa: "estación 2: el mapa" },
+  ]},
+  { id: "mapa", cap: "Dónde se frenan", quien: CO, marco: "Mapa: dónde se frenan", pantalla: "mapa 3D de celdas", meta: 60, bloques: [
+    { t: ["Este es el atlas. Cada punto es una celda de 250 metros, coloreada por la velocidad de los buses en el pico de los días hábiles. Más rojo, más lento."], haz: "Gira el mapa con el mouse si hay tiempo.", pulsa: "se levantan las celdas" },
+    { t: ["Ahora las celdas suben según las <b>bus-horas que se pierden</b> ahí cada día hábil frente al flujo libre.",
+          "En tráfico mixto se pierden unas <b>31.300 bus-horas</b> al día; en carril exclusivo, unas <b>4.800</b>. Son bus-horas, no horas de pasajeros: el feed no trae pasajeros."], pulsa: "ranking mixto" },
+  ]},
+  { id: "ranking-mixto", quien: CO, marco: "Ranking: tráfico mixto", pantalla: "barras y minimapa", meta: 60, bloques: [
+    { t: ["El ranking de tráfico mixto, zonal y alimentador. La primera celda pierde unas <b>96 bus-horas</b> cada día hábil, con 56 rutas pasando y <b>7,8 km/h</b> en el pico.",
+          "A la derecha está dónde quedan las veinte primeras."], pulsa: "intervalos" },
+    { t: ["Las líneas negras son el intervalo del 95 %, remuestreando días completos. Estas celdas son las candidatas a <b>carril preferencial o prioridad semafórica</b>."], pulsa: "ranking exclusivo" },
+  ]},
+  { id: "ranking-exclusivo", quien: CO, marco: "Ranking: carril exclusivo", pantalla: "barras y minimapa", meta: 45, bloques: [
+    { t: ["Lo mismo para troncal y dual. La primera celda pierde unas <b>70 bus-horas</b> al día, con los buses a <b>5,6 km/h</b> en el pico."], pulsa: "intervalos" },
+    { t: ["Aquí el bus ya tiene carril, así que estas celdas piden <b>otro tipo de intervención</b>. Por eso los dos rankings van separados."], pulsa: "carriles" },
+  ]},
+  { id: "carriles", quien: CO, marco: "Séptima y Carrera 13", pantalla: "barras dentro vs fuera", meta: 60, bloques: [
+    { t: ["La pregunta que todos hacen: ¿y los carriles de la Séptima y la Carrera 13?",
+          "Para las rutas que los usan, dentro del carril van <b>más lento</b> que en el resto de su ruta: en el pico, 14,0 contra 14,9 en la Séptima y 12,1 contra 14,1 en la Carrera 13."], pulsa: "aparece la advertencia" },
+    { t: ["Pero esto es <b>descriptivo, no causal</b>. No hay datos de antes de los carriles, así que no podemos decir si funcionaron. Solo cómo andan hoy esas rutas dentro y fuera."], pulsa: "estación 3: cuánto reservar" },
+  ]},
+  { id: "reservar", cap: "Cuánto reservar", quien: JF, marco: "Cuánto reservar", pantalla: "BTI por sistema y tablas", meta: 70, bloques: [
+    { t: ["La segunda solución mira lo que vive el usuario: si quiero llegar a tiempo <b>19 de cada 20 veces</b>, no me sirve el promedio, necesito el p95.",
+          "El Buffer Time Index dice cuánto sumar al tiempo medio. En el pico, la mediana va de un <b>18 a un 25 %</b> según el sistema."], pulsa: "tabla de tráfico mixto" },
+    { t: ["Pero hay pares mucho peores. En la BD237, del Rincón del Chicó a Las Ferias a las 6 de la tarde, la mediana es de 34 minutos y el p95 de <b>93</b>.",
+          "Esos extremos hay que revisarlos uno por uno antes de publicarlos."], pulsa: "tabla de exclusivo" },
+    { t: ["En carril exclusivo los colchones son menores. El peor par de troncal, en la F26 de la Calle 100 a Patio Bonito, va de 60 a 101 minutos."], pulsa: "walk-forward" },
+  ]},
+  { id: "walkforward", quien: JF, marco: "Walk-forward y horario", pantalla: "cobertura por hora", meta: 70, bloques: [
+    { t: ["¿El colchón sirve en días que no vio? Lo calculamos con cuatro días hábiles y lo probamos con otros tres: seis millones de viajes."], pulsa: "el resultado" },
+    { t: ["Y no cumple: cubre el <b>87 %</b>, no el 95 %. En el pico de la mañana llega al 92 %; en la tarde baja a 85 %.",
+          "Lo reportamos tal cual. Antes de publicar un «reserve tantos minutos» hay que entrenarlo con más días."], pulsa: "holgura del horario" },
+    { t: ["De paso, comparamos contra el horario del GTFS: según el sistema, se queda corto en una porción grande de los pares, en el dual en dos de cada tres."], pulsa: "próximo paso" },
+  ]},
+  { id: "accesibilidad", cap: "Cierre", quien: CO, marco: "Accesibilidad al empleo", pantalla: "barras por estrato: horario, típico y lento", meta: 70, bloques: [
+    { t: ["La tercera solución pregunta a cuántos empleos llega cada barrio en una hora de bus, con el horario oficial y con la operación que medimos."], pulsa: "brecha" },
+    { t: ["Primero la desigualdad de base: desde una zona de estrato 1 se alcanza el 11 % de los empleos de la ciudad; desde una de estrato 4, el 51 %. Cuatro a cinco veces menos."], pulsa: "días lentos" },
+    { t: ["Y lo que agrega la operación real: el horario es conservador en un día típico, pero en un día lento los estratos 1 y 2 pierden entre 11 y 14 % de acceso y los altos solo entre 3 y 5 %. La variabilidad castiga más a la periferia, como en Fortaleza."], pulsa: "conclusiones" },
+  ]},
+  { id: "bogota", quien: CO, marco: "Qué puede hacer Bogotá", pantalla: "tres tarjetas y nota del curso", meta: 70, bloques: [
+    { t: ["Para cerrar, qué puede hacer Bogotá con esto."], pulsa: "priorizar" },
+    { t: ["<b>Priorizar</b>: empezar por las celdas del ranking de tráfico mixto. Y si se hace, hacerlo como Santiago: segregar y fiscalizar, no solo pintar."], pulsa: "informar" },
+    { t: ["<b>Informar</b>: publicar cuánto reservar entre paradas, pero solo cuando el walk-forward se acerque al 95 %."], pulsa: "horario" },
+    { t: ["<b>Ajustar el horario</b> donde el GTFS se queda corto o le sobra tiempo."], pulsa: "para el curso" },
+    { t: ["Y para el curso: cada archivo, cada partición y cada cubo de rutas son independientes, por eso Ray. La etapa cara es el map-matching, 32 de los 57 minutos.",
+          "Con doce días y sin un antes de los carriles, nada de esto es causal."], pulsa: "va a «Gracias»" },
+  ]},
+  { id: "cierre", quien: CO, marco: "Gracias", pantalla: "gracias", meta: 15, bloques: [
+    { t: ["Muchas gracias. ¿Preguntas?"], haz: "Pulsa O para mostrar el recorrido completo mientras responden.", pulsa: "fin" },
+  ]},
+];
+
+const $ = (s) => document.querySelector(s);
+const plano = [];
+GUION.forEach((m, mi) => m.bloques.forEach((b, bi) => plano.push({ ...b, mi, bi })));
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+const metaTotal = GUION.reduce((a, m) => a + m.meta, 0);
+$("#meta").innerHTML = `Meta total: <b>${fmt(metaTotal)}</b> · este marco: <b>—</b>`;
+
+// Render
+let html = "", i = -1;
+GUION.forEach((m, mi) => {
+  html += `<h2 class="marco-titulo" id="m${mi}"><span>${String(mi + 1).padStart(2, "0")}</span><b>${m.marco}</b><span class="quien">${m.quien}</span><span class="pantalla">en pantalla: ${m.pantalla}</span></h2>`;
+  m.bloques.forEach((b) => {
+    i += 1;
+    html += `<div class="bloque${b.entrega ? " entrega" : ""}" data-i="${i}" tabindex="-1">${b.t.map((x) => `<p>${x}</p>`).join("")}${b.haz ? `<span class="haz">Haz: ${b.haz}</span>` : ""}<span class="pulsa"><i>→</i> ${b.pulsa}</span></div>`;
+  });
+});
+$("#guion-in").innerHTML = html;
+$("#marcos").innerHTML = GUION.map((m, mi) => `${m.cap ? `<li class="cap">${m.cap} · ${m.quien}</li>` : ""}<li><button type="button" data-m="${mi}"><span class="n">${String(mi + 1).padStart(2, "0")}</span><span>${m.marco}</span><span class="d">${fmt(m.meta)}</span></button></li>`).join("");
+
+const bloques = [...document.querySelectorAll(".bloque")];
+const guardar = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+const leer = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+
+let actual = Math.min(+(leer("guion-actual") || 0), plano.length - 1);
+function ir(i, desplazar = true) {
+  actual = Math.max(0, Math.min(plano.length - 1, i));
+  bloques.forEach((b, j) => { b.classList.toggle("actual", j === actual); b.classList.toggle("siguiente", j === actual + 1); });
+  const mi = plano[actual].mi;
+  document.querySelectorAll("#marcos button[data-m]").forEach((b) => { b.classList.toggle("actual", +b.dataset.m === mi); b.classList.toggle("hecho", +b.dataset.m < mi); });
+  if (desplazar) bloques[actual].scrollIntoView({ block: "center" });
+  guardar("guion-actual", actual);
+  pintarMeta();
+}
+bloques.forEach((b) => b.addEventListener("click", () => ir(+b.dataset.i)));
+document.querySelectorAll("#marcos button[data-m]").forEach((b) => b.addEventListener("click", () => ir(plano.findIndex((p) => p.mi === +b.dataset.m))));
+$("#btn-sig").addEventListener("click", () => ir(actual + 1));
+$("#btn-ant").addEventListener("click", () => ir(actual - 1));
+addEventListener("keydown", (e) => {
+  if (e.target.closest("summary, input")) return;
+  if (["ArrowRight", "ArrowDown", " ", "PageDown"].includes(e.key)) { e.preventDefault(); ir(actual + 1); }
+  if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); ir(actual - 1); }
+});
+
+// Font size
+let tam = +(leer("guion-tam") || 0) || null;
+function aplicarTam() { if (tam) document.documentElement.style.setProperty("--tam", tam + "px"); }
+$("#btn-mas").addEventListener("click", () => { tam = Math.min(48, (tam || parseInt(getComputedStyle(document.documentElement).getPropertyValue("--tam"))) + 2); aplicarTam(); guardar("guion-tam", tam); });
+$("#btn-menos").addEventListener("click", () => { tam = Math.max(16, (tam || parseInt(getComputedStyle(document.documentElement).getPropertyValue("--tam"))) - 2); aplicarTam(); guardar("guion-tam", tam); });
+aplicarTam();
+
+// Timer: total elapsed against the target, and the target of the current frame.
+let inicio = 0, acumulado = 0, corriendo = false, wake = null;
+function transcurrido() { return acumulado + (corriendo ? (performance.now() - inicio) / 1000 : 0); }
+function pintarMeta() {
+  const t = transcurrido();
+  $("#tiempo").textContent = fmt(t);
+  const mi = plano[actual].mi;
+  const hasta = GUION.slice(0, mi + 1).reduce((a, m) => a + m.meta, 0);
+  const meta = $("#meta");
+  meta.classList.toggle("tarde", corriendo && t > hasta + 10);
+  meta.innerHTML = `Meta total: <b>${fmt(metaTotal)}</b> · terminar este marco hacia <b>${fmt(hasta)}</b>`;
+}
+setInterval(() => { if (corriendo) pintarMeta(); }, 500);
+$("#btn-reloj").addEventListener("click", async () => {
+  if (corriendo) { acumulado = transcurrido(); corriendo = false; $("#btn-reloj").textContent = "Seguir"; wake?.release?.(); wake = null; }
+  else {
+    inicio = performance.now(); corriendo = true; $("#btn-reloj").textContent = "Pausar";
+    try { wake = await navigator.wakeLock?.request("screen"); } catch (e) { wake = null; }
+  }
+  pintarMeta();
+});
+$("#btn-cero").addEventListener("click", () => { acumulado = 0; inicio = performance.now(); pintarMeta(); });
+
+// Follow the presentation: it broadcasts {id, paso} on every move (same browser, same site).
+const canal = "BroadcastChannel" in window ? new BroadcastChannel("presentacion") : null;
+canal?.addEventListener("message", (e) => {
+  const { id, paso } = e.data || {};
+  if (!id) return;
+  const sync = $("#sync");
+  sync.classList.add("ok");
+  const i = plano.findIndex((p) => GUION[p.mi].id === id && p.bi === paso);
+  sync.textContent = i < 0 ? "● Sincronizado · este marco no está en el guion" : `● Sincronizado · habla ${GUION[plano[i].mi].quien}`;
+  if (i >= 0 && i !== actual) ir(i);
+});
+canal?.postMessage({ pedir: true });
+
+ir(actual);
+</script>
+
+</body>
+</html>
