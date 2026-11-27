@@ -1,9 +1,10 @@
-name: Presentación en GitHub Pages
+name: Presentaciones en GitHub Pages
 
+# El proyecto final 4 queda en la raíz (su enlace no cambia) y el 4.1 en /4.1/.
 on:
   push:
     branches: [main]
-    paths: ["4.ProyectoFinal/presentacion/**", ".github/workflows/pages.yml"]
+    paths: ["4.ProyectoFinal/presentacion/**", "4.1.ProyectoFinal/presentacion/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -18,18 +19,21 @@ concurrency:
 jobs:
   construir:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: 4.ProyectoFinal/presentacion
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: 4.ProyectoFinal/presentacion/package-lock.json
-      - run: npm ci
-      - run: npx vite build
+          cache-dependency-path: |
+            4.ProyectoFinal/presentacion/package-lock.json
+            4.1.ProyectoFinal/presentacion/package-lock.json
+      - name: Proyecto 4
+        working-directory: 4.ProyectoFinal/presentacion
+        run: npm ci && npx vite build
+      - name: Proyecto 4.1
+        working-directory: 4.1.ProyectoFinal/presentacion
+        run: npm ci && npx vite build --outDir ../../4.ProyectoFinal/presentacion/dist/4.1 --emptyOutDir
       - uses: actions/upload-pages-artifact@v3
         with:
           path: 4.ProyectoFinal/presentacion/dist
