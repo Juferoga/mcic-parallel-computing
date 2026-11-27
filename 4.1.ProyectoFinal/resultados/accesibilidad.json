@@ -1,0 +1,72 @@
+{
+ "zonas_origen": 580,
+ "empleo_total": 2881812,
+ "por_estrato": [
+  {
+   "estrato": 1.0,
+   "zonas": 68,
+   "programado_60_pct": 10.95,
+   "observado_60_pct": 13.76,
+   "observado_lento_60_pct": 9.16,
+   "brecha_obs_60": 0.143,
+   "brecha_lento_60": -0.112
+  },
+  {
+   "estrato": 2.0,
+   "zonas": 183,
+   "programado_60_pct": 20.56,
+   "observado_60_pct": 22.65,
+   "observado_lento_60_pct": 16.95,
+   "brecha_obs_60": 0.117,
+   "brecha_lento_60": -0.142
+  },
+  {
+   "estrato": 3.0,
+   "zonas": 202,
+   "programado_60_pct": 41.18,
+   "observado_60_pct": 46.55,
+   "observado_lento_60_pct": 35.67,
+   "brecha_obs_60": 0.171,
+   "brecha_lento_60": -0.106
+  },
+  {
+   "estrato": 4.0,
+   "zonas": 67,
+   "programado_60_pct": 51.17,
+   "observado_60_pct": 62.34,
+   "observado_lento_60_pct": 46.92,
+   "brecha_obs_60": 0.225,
+   "brecha_lento_60": -0.035
+  },
+  {
+   "estrato": 5.0,
+   "zonas": 29,
+   "programado_60_pct": 42.51,
+   "observado_60_pct": 51.48,
+   "observado_lento_60_pct": 40.54,
+   "brecha_obs_60": 0.172,
+   "brecha_lento_60": -0.052
+  },
+  {
+   "estrato": 6.0,
+   "zonas": 31,
+   "programado_60_pct": 29.3,
+   "observado_60_pct": 35.86,
+   "observado_lento_60_pct": 30.45,
+   "brecha_obs_60": 0.158,
+   "brecha_lento_60": -0.036
+  }
+ ],
+ "brecha_mediana_60": {
+  "observado": 0.161,
+  "observado_lento": -0.094
+ },
+ "tiempos_s": {
+  "zonas": 0.8,
+  "gtfs": 108.4,
+  "matriz_programado": 489.5,
+  "matriz_observado": 453.7,
+  "matriz_observado_lento": 439.1
+ },
+ "actores": 1
+}

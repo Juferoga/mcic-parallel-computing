@@ -1,0 +1,56 @@
+{
+ "carrera13": {
+  "rutas": 37,
+  "pico": {
+   "dentro": {
+    "v_p50": 12.1,
+    "v_rel": 0.441,
+    "tramos": 853
+   },
+   "fuera": {
+    "v_p50": 14.1,
+    "v_rel": 0.51,
+    "tramos": 10431
+   }
+  },
+  "valle": {
+   "dentro": {
+    "v_p50": 11.1,
+    "v_rel": 0.416,
+    "tramos": 1537
+   },
+   "fuera": {
+    "v_p50": 14.7,
+    "v_rel": 0.532,
+    "tramos": 19308
+   }
+  }
+ },
+ "septima": {
+  "rutas": 40,
+  "pico": {
+   "dentro": {
+    "v_p50": 14.0,
+    "v_rel": 0.459,
+    "tramos": 1581
+   },
+   "fuera": {
+    "v_p50": 14.9,
+    "v_rel": 0.527,
+    "tramos": 8384
+   }
+  },
+  "valle": {
+   "dentro": {
+    "v_p50": 15.3,
+    "v_rel": 0.503,
+    "tramos": 2855
+   },
+   "fuera": {
+    "v_p50": 15.9,
+    "v_rel": 0.56,
+    "tramos": 16185
+   }
+  }
+ }
+}

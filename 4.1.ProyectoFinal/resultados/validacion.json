@@ -1,0 +1,55 @@
+{
+ "estabilidad_mixto": {
+  "dias_a": [
+   "2026-11-12",
+   "2026-11-13",
+   "2026-11-17"
+  ],
+  "dias_b": [
+   "2026-11-18",
+   "2026-11-19",
+   "2026-11-20",
+   "2026-11-23"
+  ],
+  "spearman_top200": 0.629,
+  "solape_top20": 10
+ },
+ "estabilidad_exclusivo": {
+  "dias_a": [
+   "2026-11-12",
+   "2026-11-13",
+   "2026-11-17"
+  ],
+  "dias_b": [
+   "2026-11-18",
+   "2026-11-19",
+   "2026-11-20",
+   "2026-11-23"
+  ],
+  "spearman_top200": 0.753,
+  "solape_top20": 12
+ },
+ "sintetico_52s": {
+  "tramos": 3601,
+  "sesgo_rel": 0.0047,
+  "mediana_abs_rel": 0.0838,
+  "p90_abs_rel": 0.2184
+ },
+ "magnitudes_vs_2024": {
+  "troncal": {
+   "medida": 21.8,
+   "oficial": 25.2,
+   "dif_rel": -0.135
+  },
+  "dual": {
+   "medida": 17.9,
+   "oficial": 19.8,
+   "dif_rel": -0.096
+  },
+  "alimentador": {
+   "medida": 14.3,
+   "oficial": 17.5,
+   "dif_rel": -0.183
+  }
+ }
+}

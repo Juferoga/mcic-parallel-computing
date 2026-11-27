@@ -1,0 +1,101 @@
+ruta,sistema,desde,hasta,hora,n,p50_min,p95_min,colchon_min,bti,pti,holgura
+BD237,zonal,Br. Rincón del Chicó,Br. Las Ferias,18,21,33.68,93.01,59.33,0.77,8.37,corto
+SE10,zonal,Hsp. Infantil San José,Br. Santa Rosita,17,20,33.81,90.47,56.66,1.2,7.52,corto
+K328,zonal,Parroquia San Andrés,Avenida Alsacia,7,20,43.2,99.67,56.47,0.82,8.83,corto
+K328,zonal,Calle 40 Sur,Br. Villa Alsacia,7,22,44.22,100.05,55.83,0.83,9.35,corto
+SE10,zonal,Br. La Paz,Br. Almería,17,20,38.62,93.45,54.84,1.1,8.28,corto
+442,zonal,Br. Chicó Navarra,Cruz Roja,18,23,36.51,91.24,54.73,0.94,8.66,corto
+BD237,zonal,C.C. Hacienda Santa Bárbara,Br. Andes Norte,17,21,57.8,112.28,54.48,0.77,10.2,corto
+K328,zonal,Br. Nueva York,Av. Centenario,7,21,48.5,101.81,53.32,0.71,9.38,corto
+SE10,zonal,Br. Las Ferias,Br. Villas del Dorado,18,27,29.39,82.45,53.06,1.36,6.12,corto
+SE10,zonal,Cementerio Chapinero,Br. Almería,17,21,37.52,90.52,52.99,1.11,8.41,corto
+SE10,zonal,CAI Las Ferias,Colegio Endrich,18,27,31.13,83.95,52.82,1.31,6.21,corto
+K308,zonal,Parroquia San Andrés,Avenida Alsacia,7,26,40.97,93.55,52.58,0.87,7.5,corto
+BD237,zonal,Br. Chicó Navarra,Br. Las Ferias,18,28,41.56,93.81,52.25,0.78,8.44,corto
+SE10,zonal,Br. Las Ferias,Pq. Público Bosques de Mariana,18,28,32.9,85.03,52.13,1.26,6.36,corto
+K308,zonal,Calle 40 Sur,Br. Villa Alsacia,7,27,42.93,94.77,51.84,0.81,8.14,corto
+SE10,zonal,Br. Alcázares,Br. Tabora,17,20,37.06,88.52,51.46,1.06,8.29,corto
+K328,zonal,Hogar Hosp San José(Br Carvajal),Br. Ciudad Hayuelos,7,21,48.04,99.47,51.43,0.78,9.62,corto
+BD237,zonal,Br. Santa Ana Occidental,Cafam Floresta,17,22,62.6,113.49,50.9,0.67,9.28,corto
+SE10,zonal,Br. Bonanza,Villas del Dorado San Antonio,18,27,29.75,80.43,50.68,1.3,5.67,corto
+K328,zonal,IED OEA Sede B,Br. Ciudad Hayuelos,7,22,50.72,101.35,50.63,0.68,8.64,corto
+SE10,zonal,Br. San Fernando Occidental,Br. Álamos Norte,18,30,32.25,82.13,49.89,1.22,7.05,corto
+SE10,zonal,Colegio Cooperativo Unión Social,Br. Álamos Norte,18,29,33.64,83.39,49.74,1.15,6.92,corto
+HK635,zonal,Parroquia San Andrés,Avenida Alsacia,7,26,40.37,89.7,49.33,0.93,7.24,corto
+K700,zonal,Pq. Lagunetas,Cooperativa de Sub-Oficiales,7,20,30.45,79.63,49.17,0.92,6.69,ok
+K308,zonal,Pq. Lagunetas,Cooperativa de Sub-Oficiales,7,27,29.34,78.33,49.0,1.1,6.55,corto
+K322,zonal,Centro Fontibón,Urbanización Brisas,17,25,20.55,69.52,48.97,1.16,6.3,ok
+K308,zonal,Br. Nueva York,Av. Centenario,7,26,47.27,95.77,48.49,0.73,8.08,corto
+SE10,zonal,Avenida La Esmeralda,Br. El Cedro,18,32,31.49,79.95,48.46,1.21,7.02,corto
+HK635,zonal,Br. Venecia Occidental,Cooperativa de Sub-Oficiales,7,29,29.98,78.16,48.18,1.19,6.33,corto
+BD237,zonal,Canal Molinos,Cafam Floresta,17,23,63.97,112.03,48.06,0.65,9.63,corto
+K322,zonal,Villemar,Urbanización Brisas,17,26,23.69,71.67,47.98,1.0,5.78,ok
+BD237,zonal,Escuela de Caballería,Cafam Floresta,17,23,62.86,110.56,47.7,0.66,10.04,corto
+BD237,zonal,Escuela de Infantería,Pq. Metrópolis,18,22,46.22,93.9,47.68,0.82,8.89,corto
+C154,zonal,Br. Santa Rosita,Br. Lisboa,18,21,31.36,78.86,47.49,1.14,4.99,corto
+HL602,zonal,Br. Olaya,Br. San Benito,17,20,43.38,90.51,47.13,0.78,6.4,corto
+CA153,zonal,Br. Almería,Planta Tratamiento Salitre,18,21,30.09,77.05,46.96,0.86,5.15,corto
+BD237,zonal,Br. El Pedregal,Avenida Calle 80,17,23,63.2,110.15,46.95,0.64,10.01,corto
+BD237,zonal,Autopista Norte,Br. Bonanza,18,41,40.3,86.87,46.56,0.66,7.74,corto
+K308,zonal,IED OEA Sede B,Br. Ciudad Hayuelos,7,26,49.69,96.23,46.53,0.69,7.71,corto
+HL602,zonal,Br. Olaya,Br. San Benito,17,23,44.39,90.89,46.5,0.78,6.18,corto
+T12,zonal,Br. Olaya,Br. San Benito,18,20,40.43,86.83,46.4,0.7,5.53,corto
+K308,zonal,Hogar Hosp San José(Br Carvajal),Br. Ciudad Hayuelos,7,24,47.53,93.94,46.4,0.71,8.38,corto
+H907,zonal,Br. Barrancas Norte,Br. Santa Ana Occidental,6,32,34.39,80.36,45.96,0.92,7.89,corto
+K328,zonal,Br. Hipotecho Occidental,La Felicidad,7,21,46.72,92.65,45.93,0.74,9.72,corto
+C154,zonal,Br. Pinar de los Álamos,Gimnasio Moderno Montesoriano,18,21,33.25,79.09,45.85,1.09,4.76,corto
+CA153,zonal,Br. Santa Rosita,Br. Lisboa,18,20,30.95,76.68,45.74,0.74,5.05,corto
+BD237,zonal,Urb. Conjunto de La 100,C.C. Metrópolis,17,23,61.38,106.83,45.45,0.62,10.1,corto
+CA153,zonal,Br. Tabora,Puente de Guadua,18,23,31.33,76.75,45.42,0.87,5.55,corto
+BD237,zonal,Br. Rincón del Chicó,Br. Las Ferias,17,23,61.52,106.81,45.29,0.58,9.62,corto
+BD237,zonal,Escuela de Infantería,Pq. Metrópolis,17,23,60.35,105.42,45.07,0.59,9.98,corto
+H907,zonal,Br. Barrancas Norte,C.C. Hacienda Santa Bárbara,6,32,33.71,78.55,44.84,0.93,7.9,corto
+HL602,zonal,Br. Restrepo Occidental,Portal Tunal,17,22,38.4,83.16,44.76,0.87,5.91,corto
+K700,zonal,Parroquia San Andrés,Avenida Alsacia,7,20,44.02,88.4,44.37,0.6,6.93,corto
+H907,zonal,SENA Usaquén,Escuela de Caballería,6,32,34.75,79.0,44.25,0.97,7.7,corto
+BD237,zonal,C.C. Iserra 100,Br. Tabora,17,22,47.2,91.28,44.09,0.77,7.63,corto
+T12,zonal,Br. San José Sur,Br. San Benito,18,20,45.38,89.42,44.05,0.63,5.36,corto
+T12,zonal,Br. Libertador,Br. Lucero del Sur,18,20,41.85,85.79,43.94,0.66,6.03,corto
+C101,zonal,IED República de Colombia,Pq. Público Plazuelas del Virrey,18,23,33.92,77.62,43.7,0.94,5.99,corto
+C509,zonal,Uniagustiniana,Br. Isabela I,18,26,28.32,71.97,43.64,1.0,6.61,corto
+K700,zonal,Br. Venecia Occidental,Avenida Américas,7,20,26.93,70.57,43.64,0.93,5.87,ok
+K308,zonal,Br. Venecia Occidental,Avenida Américas,7,27,27.12,70.67,43.55,1.09,5.86,corto
+HK635,zonal,Estación La Sevillana,Avenida Américas,7,27,26.4,69.92,43.53,1.12,5.67,corto
+K700,zonal,Colmotores,Avenida Américas,7,20,28.05,71.57,43.51,0.91,5.62,ok
+L149,zonal,CAI Villa Luz,Estación CAN,7,20,32.32,75.83,43.51,0.77,6.43,corto
+H907,zonal,Museo Fco de Paula Santander,Br. El Pedregal,6,32,33.45,76.94,43.5,0.97,7.8,corto
+K321,zonal,Aeronáutica Civil,Br. El Laurel,18,20,38.18,81.62,43.45,0.69,6.26,corto
+C101,zonal,AC 72,Pq. Público Villa Amalia,18,22,34.42,77.85,43.43,0.94,6.03,corto
+BD237,zonal,Br. Santa Bibiana,Br. Bonanza,18,43,45.68,89.01,43.33,0.63,7.63,corto
+C101,zonal,Br. La Estradita,Br. Álamos Norte,18,23,34.04,77.15,43.12,0.92,5.85,corto
+L149,zonal,Br. Villa Luz,Estación Salitre - El Greco,7,20,32.43,75.43,43.0,0.81,6.2,corto
+H907,zonal,IED Divino Maestro,Fundación Santa Fe de Bogotá,6,30,34.71,77.69,42.97,0.86,7.61,corto
+K321,zonal,CIAC,Br. El Laurel,18,20,37.51,80.35,42.84,0.69,6.25,corto
+T12,zonal,Br. San José Sur,Portal Tunal,18,21,38.26,81.1,42.84,0.65,5.31,corto
+T12,zonal,Br. Sociego Sur,Portal Tunal,18,21,39.49,82.12,42.62,0.63,5.16,corto
+H907,zonal,CUN Sede Norte,Br. Santa Bárbara Oriental,6,32,34.13,76.59,42.46,0.86,7.21,corto
+DK211,zonal,Compensar CUR,CAI Álamos,18,23,32.89,74.99,42.09,0.99,6.33,corto
+T12,zonal,Br. Murillo Toro,Br. Lucero del Sur,18,20,40.99,83.07,42.08,0.65,5.98,corto
+DK211,zonal,Estación Av. Rojas,Br. Álamos,18,21,30.67,72.75,42.07,1.04,6.39,corto
+C101,zonal,CAI Las Ferias,Pq. Público Villa Amalia,18,20,32.67,74.53,41.86,0.97,6.09,corto
+G147,zonal,Br. Aures II,Br. Florida Blanca,17,20,23.54,65.34,41.8,1.24,5.75,ok
+C321,zonal,Portal Eldorado,Sidauto,18,34,42.25,83.49,41.24,0.68,5.9,corto
+CA153,zonal,Br. Tabora,Gimnasio Moderno Montesoriano,18,23,33.51,74.55,41.05,0.79,5.33,corto
+C101,zonal,Br. Bosque Popular,Br. El Cedro,18,23,32.43,73.34,40.92,0.84,5.4,corto
+K315,zonal,Veracruz Sector II,Br. San Pablo Jericó,18,32,35.6,76.43,40.83,0.71,5.6,corto
+442,zonal,Br. Santa Bibiana,Colegio Cafam,18,28,43.86,84.69,40.83,0.71,7.31,corto
+C509,zonal,Br. El Vergel Occidental,Br. Pinar de los Álamos,18,26,33.09,73.56,40.47,0.91,6.53,corto
+C315,zonal,Pq. Empresarial Puerta del Sol,Humedal Juan Amarillo,18,20,42.56,82.96,40.4,0.72,6.08,corto
+C509,zonal,C.C. Hayuelos,Br. La Granja,18,27,41.32,81.65,40.34,0.76,6.4,corto
+C101,zonal,Parque el Trebol S-N,Br. El Cedro,18,24,30.66,70.97,40.31,0.92,5.62,corto
+K315,zonal,Aeronáutica Civil,Br. El Laurel,18,33,36.18,76.41,40.23,0.72,5.88,corto
+L149,zonal,Br. Santa Helenita,Estación El Tiempo - Maloka,7,20,36.62,76.83,40.21,0.63,5.27,corto
+K315,zonal,CIAC,Br. El Laurel,18,33,35.49,75.65,40.16,0.73,5.9,corto
+HK635,zonal,Br. Madelena,Br. Triunfo de las Américas,7,26,24.02,63.92,39.9,1.07,4.85,corto
+L149,zonal,Avenida Ciudad de Cali,Estación Av. Rojas,7,20,40.41,80.11,39.71,0.62,5.09,corto
+C315,zonal,Portal Eldorado,Sidauto,18,21,45.5,85.14,39.65,0.72,6.34,corto
+C101,zonal,Br. Las Ferias,Br. Villa Amalia,18,22,31.17,70.8,39.63,0.95,5.66,corto
+L149,zonal,Br. Santa Helenita,Br. Salitre Occidental,7,20,38.21,77.72,39.52,0.63,5.26,corto
+C321,zonal,Pq. Empresarial Puerta del Sol,Humedal Juan Amarillo,18,34,41.54,81.05,39.52,0.67,5.75,corto
+C509,zonal,Br. El Vergel Occidental,Br. La Clarita,18,27,36.31,75.7,39.4,0.84,6.44,corto
+CA153,zonal,Br. Álamos Norte,Br. Lisboa,18,20,30.47,69.57,39.1,0.82,5.11,corto
