@@ -27,6 +27,10 @@ Tres soluciones sobre un mismo pipeline en Ray:
 3. **Brecha de accesibilidad al empleo** entre el horario y la operación observada, por estrato (r5py + Encuesta de
    Movilidad 2023).
 
+El proyecto 1 se plantea como optimización: con un presupuesto limitado, ¿qué celdas tratar para recuperar más
+bus-horas? Es una mochila 0-1 con pesos iguales (cada celda son 250 m de carril), así que el óptimo es tratar las
+celdas en orden de ahorro (`pipeline/tm/economia.py`, `pipeline/valorar.py`).
+
 No se usan intervalos entre buses (headways): ese es el tema de la tesis.
 
 ## Resultados (12 al 23 de noviembre de 2026)
@@ -41,6 +45,13 @@ empezó ese día.
 | Retraso frente al flujo libre (bus-horas por día hábil) | 3.865 | 928 | 1.597 | 29.478 |
 | Colchón típico en el pico (BTI mediano) | 0,18 | 0,22 | 0,25 | 0,21 |
 
+- **Cuánto cuesta** (`resultados/economia.json`): de cada hora de operación, el retraso frente al flujo libre son 32
+  min en el zonal y 24 en la troncal. Con $201 mil por bus-hora (costo del SITP, 6,9 billones al año, entre sus horas
+  de servicio), 14 y 45 pasajeros a bordo (IPK × viaje supuesto de 10 km) y $4.200 por hora de pasajero (50 % del
+  mínimo 2026), el retraso cuesta $9,9 mil millones por día hábil, unos $2,5 billones al año. Es un techo.
+- **Dónde invertir:** con un carril que sube la velocidad entre 10 % y 20 % (Bogotá +11 %, Nueva York +8,4 %,
+  Filadelfia +12,3 %, Santiago ≈ +20 %), los primeros 10 km de la lista devuelven 355 a 651 bus-horas por día hábil,
+  $23 a 42 mil millones al año. A $1.000 millones por km (supuesto), se pagan en 3 a 5 meses.
 - **Dónde se frenan:** la celda de tráfico mixto con más retraso está en el sur (Usme, lat 4,51), con 96 bus-horas por
   día hábil (IC 95 % de 85 a 106) y 56 rutas. En carril exclusivo, la Caracas en el centro, con medianas de 5 a 6 km/h
   en el pico. Rankings en `resultados/ranking_mixto.csv` y `ranking_exclusivo.csv`.
@@ -117,6 +128,7 @@ uv run python pipeline.py --raw ../datos/raw --gtfs ../datos/gtfs/GTFS.zip --dia
     --out ../datos/salida/completo --modo ray --cpus 8 --tiempos ../resultados/tiempos.jsonl
 uv run python calidad.py --out ../datos/salida/completo --resultados ../resultados
 uv run python metricas.py --out ../datos/salida/completo --gtfs ../datos/gtfs/GTFS.zip --resultados ../resultados
+uv run python valorar.py --resultados ../resultados   # costo del retraso y curva km → bus-horas
 setsid nohup ./bench_local.sh &      # escalamiento fuerte: secuencial y Ray con 1, 2, 4 y 8 (log en ../datos/salida/bench.log)
 uv sync --group acceso                # proyecto 3: r5py (Java 21+)
 uv run python accesibilidad.py --gtfs ../datos/gtfs/GTFS.zip --osm ../datos/osm/Bogota.osm.pbf --em ../datos/em2023 \
