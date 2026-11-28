@@ -19,7 +19,7 @@ const W = 1600, H = 900;
 const COLOR_CAP = ["var(--gris)", "var(--azul-tm)", "var(--tm-rojo)", "var(--verde-tm)", "var(--gris)"];
 // Colores heráldicos UD por capítulo (azur, gules, sinople); el texto encima siempre es blanco.
 const SOBRE_CAP = ["#fff", "#fff", "#fff", "#fff", "#fff"];
-const CAPITULOS = ["Inicio", "Datos y Ray", "Dónde se frenan", "Cuánto reservar", "Cierre"];
+const CAPITULOS = ["El problema", "Cómo lo medimos", "Dónde invertir", "Horario y equidad", "Cierre"];
 const ULTIMO = CAPITULOS.length - 1;
 const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
 

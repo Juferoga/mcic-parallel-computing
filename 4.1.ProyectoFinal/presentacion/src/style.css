@@ -451,3 +451,17 @@ svg .halo { paint-order: stroke; stroke: #fff; stroke-width: 6px; stroke-linejoi
 /* Proyecto 4.1: accesibilidad por estrato */
 .acceso-fila { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 18px; color: var(--texto-2); }
 .acceso-fila .vd { grid-template-columns: 1fr 64px; gap: 8px; margin: 2px 0; }
+
+/* Costo del retraso: la cuenta en una línea. */
+.ecuacion { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; row-gap: 22px; }
+.ecuacion > .salto { flex-basis: 100%; height: 0; }
+.ecuacion > i { font-style: normal; font-family: var(--titulo); font-size: 54px; color: var(--ud-rojo); }
+.termino { display: flex; flex-direction: column; gap: 6px; padding: 16px 22px; border: 1.5px solid var(--ud-borde); border-radius: 8px; background: rgba(255, 255, 255, 0.95); }
+.termino b { font-family: var(--titulo); font-size: 46px; line-height: 1; color: var(--texto); font-variant-numeric: tabular-nums; }
+.termino > span { font-size: 19px; color: var(--muted); }
+.termino.total { border-color: var(--ud-rojo); background: var(--ud-claro); }
+/* Modelo de optimización y plan en pasos. */
+.modelo p { font-size: 23px; margin: 4px 0; }
+.modelo small { font-size: 17px; color: var(--muted); margin-left: 8px; }
+ol.plan { margin: 0; padding-left: 34px; display: grid; gap: 14px; font-size: 22px; line-height: 1.4; color: var(--texto-2); }
+ol.plan li::marker { font-family: var(--titulo); font-weight: 700; color: var(--ud-rojo); }

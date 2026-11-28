@@ -258,43 +258,6 @@ function ranking(clave) {
   };
 }
 
-// ---------------- Carriles: velocidad dentro y fuera del carril, en las mismas rutas ----------------
-const carriles = {
-  montar(el) {
-    const C = datos.carriles;
-    const grupos = [["septima", "Séptima · Cl 28–100"], ["carrera13", "Carrera 13 · Cl 19–67"]];
-    const w = 860, h = 500, x0 = 60, base = 420;
-    const y = escala(0, 18, base, 20);
-    let c = `<line class="eje-linea" x1="${x0}" x2="${w}" y1="${base}" y2="${base}"/>`;
-    for (const v of [5, 10, 15]) c += `<line class="rejilla" x1="${x0}" x2="${w}" y1="${y(v)}" y2="${y(v)}"/><text x="${x0 - 10}" y="${y(v) + 5}" text-anchor="end" font-size="19">${v}</text>`;
-    c += `<text x="${x0 - 10}" y="${y(18) + 5}" text-anchor="end" font-size="18">km/h</text>`;
-    const gw = (w - x0) / 2, bw = 62;
-    grupos.forEach(([k, nom], gi) => {
-      const g = C[k];
-      if (!g) return;
-      const gx = x0 + gi * gw;
-      ["pico", "valle"].forEach((f, fi) => {
-        const fx = gx + 30 + fi * (gw / 2);
-        ["dentro", "fuera"].forEach((lado, li) => {
-          const d = g[f][lado], bx = fx + li * (bw + 8);
-          c += `<rect class="c-barra" x="${bx}" y="${base}" width="${bw}" height="0" data-h="${base - y(d.v_p50)}" rx="4" fill="${lado === "dentro" ? "var(--tm-rojo)" : "var(--ud-plata)"}" data-tip="${nom} · ${f} · ${lado} del carril · <b>${dec(d.v_p50)} km/h</b> · ${Math.round(100 * d.v_rel)} % de su flujo libre · ${miles(d.tramos)} tramo-hora"/>`;
-          c += `<text x="${bx + bw / 2}" y="${y(d.v_p50) - 8}" text-anchor="middle" font-size="18" class="t-fuerte">${dec(d.v_p50)}</text>`;
-        });
-        c += `<text x="${fx + bw + 4}" y="${base + 26}" text-anchor="middle" font-size="18">${f}</text>`;
-      });
-      c += `<text x="${gx + gw / 2}" y="${base + 58}" text-anchor="middle" font-size="20" class="t-fuerte">${nom}</text><text x="${gx + gw / 2}" y="${base + 80}" text-anchor="middle" font-size="16">${g.rutas} rutas</text>`;
-    });
-    lienzo(el).innerHTML = svg(w, h + 90, c);
-    conTooltip(el);
-  },
-  entrar(el) {
-    el.querySelectorAll(".c-barra").forEach((r, i) => {
-      const hh = +r.dataset.h;
-      gsap.fromTo(r, { attr: { height: 0, y: 420 } }, { attr: { height: hh, y: 420 - hh }, duration: D(0.9), delay: D(0.2 + i * 0.06), ease: "power3.out" });
-    });
-  },
-};
-
 // ---------------- Cuánto reservar: BTI por sistema y los pares menos confiables ----------------
 const reservar = {
   montar(el) {
@@ -302,9 +265,10 @@ const reservar = {
     const max = Math.max(...Object.values(bti));
     el.querySelector("[data-bti]").innerHTML = TIPOS_V.filter(([k]) => bti[k] != null).map(([k, col, nom]) =>
       `<div class="vd" data-tip="${nom} · BTI mediano en el pico: <b>${dec(bti[k], 3)}</b>"><span>${nom}</span><i style="width:${(100 * bti[k]) / max}%;background:${col}"></i><b>+${Math.round(100 * bti[k])} %</b></div>`).join("");
-    for (const g of ["mixto", "exclusivo"]) {
+    for (const caja of el.querySelectorAll("[data-pares]")) {
+      const g = caja.dataset.pares;
       const filas = datos.confiables[g].map((p) => `<tr><td><b>${p.ruta}</b></td><td>${p.desde} → ${p.hasta}</td><td>${p.hora}h</td><td>${p.p50} min</td><td><b>${p.p95} min</b></td></tr>`).join("");
-      el.querySelector(`[data-pares="${g}"]`).innerHTML = `<table class="tabla-bench tabla-pares"><thead><tr><th>ruta</th><th>de → a</th><th>hora</th><th>p50</th><th>p95</th></tr></thead><tbody>${filas}</tbody></table>`;
+      caja.innerHTML = `<table class="tabla-bench tabla-pares"><thead><tr><th>ruta</th><th>de → a</th><th>hora</th><th>p50</th><th>p95</th></tr></thead><tbody>${filas}</tbody></table>`;
     }
     conTooltip(el);
   },
@@ -360,7 +324,44 @@ const accesibilidad = {
   },
 };
 
+// ---------------- Costo del retraso: solo las fuentes de los supuestos ----------------
+const costo = {
+  montar(el) {
+    el.querySelector("[data-fuentes]").innerHTML = "Supuestos: " + datos.economia.supuestos.fuentes.join(" · ");
+  },
+};
+
+// ---------------- Curva óptima: km de carril tratados en orden de ahorro → bus-horas recuperadas por día ----------------
+const optimo = {
+  pasos: 1,
+  montar(el) {
+    const E = datos.economia, K = E.curva, ESC = E.escenarios;
+    const w = 1420, h = 400, x0 = 90, base = 350, kmax = K.at(-1).km, ymax = Math.ceil(K.at(-1).alto / 1000) * 1000;
+    const x = escala(0, kmax, x0, w - 40), y = escala(0, ymax, base, 40);
+    let c = `<line class="eje-linea" x1="${x0}" x2="${w - 40}" y1="${base}" y2="${base}"/>`;
+    for (let v = 0; v <= ymax; v += 1000) c += `<line class="rejilla" x1="${x0}" x2="${w - 40}" y1="${y(v)}" y2="${y(v)}"/><text x="${x0 - 10}" y="${y(v) + 6}" text-anchor="end" font-size="19">${miles(v)}</text>`;
+    for (let km = 0; km <= kmax; km += 25) c += `<text x="${x(km)}" y="${base + 28}" text-anchor="middle" font-size="19">${km}</text>`;
+    c += `<text x="${(x0 + w) / 2}" y="${base + 56}" text-anchor="middle" font-size="20">km de calle tratados, de la celda que más ahorra a la que menos</text>`;
+    c += `<text x="${x0 + 8}" y="14" font-size="17">bus-horas recuperadas por día hábil</text>`;
+    const banda = `M${K.map((p) => `${x(p.km)},${y(p.alto)}`).join(" L")} L${[...K].reverse().map((p) => `${x(p.km)},${y(p.bajo)}`).join(" L")} Z`;
+    c += `<path d="${banda}" fill="var(--azul-tm)" fill-opacity=".18"/>`;
+    for (const [k, etq] of [["alto", "+20 % de velocidad"], ["bajo", "+10 %"]]) {
+      c += `<path class="o-linea" d="M${K.map((p) => `${x(p.km)},${y(p[k])}`).join(" L")}" fill="none" stroke="var(--azul-tm)" stroke-width="${k === "alto" ? 4 : 2.5}"/>`;
+      c += `<text x="${x(kmax) - 6}" y="${y(K.at(-1)[k]) - 12}" text-anchor="end" font-size="19" class="t-fuerte halo">${etq}</text>`;
+    }
+    for (const e of ESC) {
+      c += `<g data-tip="${e.km} km · <b>${miles(e.bus_h_bajo)}–${miles(e.bus_h_alto)} bus-h/día</b>"><line x1="${x(e.km)}" x2="${x(e.km)}" y1="${base}" y2="${y(e.bus_h_alto)}" stroke="var(--tm-rojo)" stroke-width="2" stroke-dasharray="5 5"/>`;
+      c += `<circle cx="${x(e.km)}" cy="${y(e.bus_h_alto)}" r="7" fill="var(--tm-rojo)"/><circle cx="${x(e.km)}" cy="${y(e.bus_h_bajo)}" r="6" fill="var(--tm-rojo)"/>`;
+      c += `<text x="${x(e.km) + 10}" y="${y(e.bus_h_alto) - 10}" font-size="19" class="t-fuerte halo">${e.km} km: ${miles(e.bus_h_bajo)}–${miles(e.bus_h_alto)}</text></g>`;
+    }
+    lienzo(el).innerHTML = svg(w, h + 70, c);
+    const fila = (e) => `<tr><td><b>${e.km} km</b></td><td>${miles(e.bus_h_bajo)}–${miles(e.bus_h_alto)}</td><td>${miles(e.bus_h_bajo / e.km)}–${miles(e.bus_h_alto / e.km)}</td><td>$${dec(e.valor_anio_bajo)}–${dec(e.valor_anio_alto)} mil M</td><td>$${dec(e.costo_milmill)} mil M</td><td><b>${dec(e.meses_alto)}–${dec(e.meses_bajo)} meses</b></td></tr>`;
+    el.querySelector("[data-escenarios]").innerHTML = `<table class="tabla-bench"><thead><tr><th>presupuesto</th><th>bus-h/día recuperadas</th><th>por km</th><th>valor al año</th><th>inversión</th><th>se paga en</th></tr></thead><tbody>${ESC.map(fila).join("")}</tbody></table>`;
+    conTooltip(el);
+  },
+};
+
 export const graficos = {
-  velhora, calor, pipeline, speedup, carriles, reservar, walkforward, accesibilidad,
-  rankingMixto: ranking("mixto"), rankingExclusivo: ranking("exclusivo"),
+  velhora, calor, pipeline, speedup, reservar, walkforward, accesibilidad, costo, optimo,
+  rankingMixto: ranking("mixto"),
 };

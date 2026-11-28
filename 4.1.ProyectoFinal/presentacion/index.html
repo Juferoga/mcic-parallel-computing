@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dónde pierden tiempo los buses · TransMilenio + Ray</title>
-  <meta name="description" content="Proyecto final de Computación Paralela: dónde pierden tiempo los buses de Bogotá, con 12 días del GTFS-Realtime de TransMilenio procesados en Ray." />
+  <title>Dónde invertir en los buses · TransMilenio + Ray</title>
+  <meta name="description" content="Proyecto final de Computación Paralela: cuánto tiempo pierden los buses de Bogotá, cuánto cuesta y dónde invertir primero, con 12 días del GTFS-Realtime de TransMilenio procesados en Ray." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -23,11 +23,11 @@
     <div id="world">
       <svg id="ruta" aria-hidden="true"></svg>
 
-      <!-- ============================== 0 · INICIO ============================== -->
+      <!-- ============================== 0 · EL PROBLEMA ============================== -->
       <section class="frame portada" id="portada" data-x="0" data-y="0" data-cap="0" data-titulo="Portada">
         <!-- Maqueta de la plantilla UD: portada_base.jpg ya trae el panel rojo con el escudo invertido y las flechas. -->
         <div class="frame-in">
-          <h1 class="titulo-grande"><span class="linea">Dónde pierden <em>tiempo</em></span> <span class="linea">los buses de Bogotá</span> <span class="linea">12 días de TransMilenio en Ray</span></h1>
+          <h1 class="titulo-grande"><span class="linea">Dónde invertir para que</span> <span class="linea">los buses de Bogotá <em>no pierdan tiempo</em></span> <span class="linea">12 días de TransMilenio en Ray</span></h1>
           <p class="kicker">Proyecto final · Computación Paralela · Módulo 9: Ray</p>
           <hr class="regla" />
           <p class="autores"><span>Juan Felipe Rodríguez Galindo <small>20261595004</small></span><span>Carlos Stiven Mora Hoyos <small>20261595003</small></span></p>
@@ -48,215 +48,246 @@
 
       <section class="frame" id="problema" data-x="1950" data-y="0" data-cap="0" data-titulo="El problema" data-grafico="velhora">
         <div class="frame-in dividido">
-          <header class="titulo-marco"><h2>Los buses de Bogotá son cada año más lentos</h2><p class="kicker">El problema</p></header>
+          <header class="titulo-marco"><h2>De cada hora que opera un bus zonal, <span data-dato="economia.min_por_hora.zonal">31</span> minutos son retraso</h2><p class="kicker">El problema</p></header>
           <div class="texto">
-            <p>La velocidad zonal en el pico de la mañana bajó de <b>26,8</b> a <b>24,9 km/h</b> entre 2023 y 2024. En ese mismo periodo, la demanda zonal cayó.</p>
-            <div class="tarjeta rojo paso" data-paso="1"><h3>Sin mapa público</h3><p>La ciudad decide carriles exclusivos y prioridad semafórica sin un mapa de <b>dónde</b> y <b>a qué hora</b> se frenan los buses.</p></div>
-            <div class="concepto paso" data-paso="2"><span class="etq">Pregunta del proyecto</span><p>¿Dónde y cuándo pierden tiempo los buses, y cuánto tiempo hay que reservar para llegar a tiempo?</p></div>
-            <p class="muted">A la derecha, lo que medimos: velocidad mediana por tramo y hora en los días hábiles del 12 al 23 de noviembre.</p>
+            <p><b>Retraso</b> = lo que tarda el bus en un tramo de 500 m − lo que tarda en ese mismo tramo cuando va libre (su mejor 5&nbsp;%). Son semáforos, trancones y paradas largas.</p>
+            <div class="cifras pequeñas">
+              <div><b data-dato="economia.retraso_bus_h">35.868</b><span>horas de bus perdidas cada día hábil, sumando todos los sistemas</span></div>
+              <div><b data-dato="economia.pct_retraso.troncal" data-fmt="pct0">40&nbsp;%</b><span>del tiempo en la troncal, que ya tiene carril propio</span></div>
+            </div>
+            <div class="tarjeta rojo paso" data-paso="1"><h3>Un bus lento sale caro</h3><p>Para dar la misma frecuencia hacen falta más buses y más conductores, y el pasajero que pierde tiempo se va: la demanda zonal cayó 7,7&nbsp;% en un semestre.</p></div>
           </div>
           <div class="grafico" data-svg></div>
         </div>
-        <aside class="nota">Las cifras oficiales dicen que el bus zonal va más lento cada año. El gráfico ya es nuestro: sale del pipeline.</aside>
+        <aside class="nota">El gráfico es nuestro: velocidad mediana por hora en los días hábiles del 12 al 23 de noviembre. El valle de las 6–8 y las 17–19 h es donde más se pierde.</aside>
       </section>
 
-      <section class="frame" id="ciudades" data-x="3900" data-y="0" data-cap="0" data-titulo="Otras ciudades">
+      <section class="frame" id="costo" data-x="3900" data-y="0" data-cap="0" data-titulo="Cuánto cuesta" data-grafico="costo">
         <div class="frame-in">
-          <header class="titulo-marco"><h2>Otras ciudades ya publican ese mapa</h2><p class="kicker">Qué hacen otras ciudades</p></header>
-          <div class="opciones">
-            <div class="opcion paso" data-paso="1" style="--c:var(--azul-tm)"><h3>Nueva York</h3><p>La MTA publica la velocidad por tramo, día y hora, sacada del GPS de los buses. Con esos datos, el Contralor califica cada línea.</p><div class="dato"><b>186 de 332</b>líneas con nota D o F (2024)</div></div>
-            <div class="opcion paso" data-paso="2" style="--c:var(--verde-tm)"><h3>California</h3><p>Cal-ITP calcula la velocidad p20/p50/p80 por tramo solo con GTFS-Realtime archivado.</p><div class="dato"><b>abril de 2026</b>métrica oficial para evaluar la prioridad semafórica</div></div>
-            <div class="opcion paso" data-paso="3" style="--c:var(--tm-rojo)"><h3>Santiago</h3><p>Con GPS de 500 rutas compararon corredores tratados y de control. Los carriles solo pintados no muestran un efecto significativo.</p><div class="dato"><b>≈ +20 %</b>de velocidad en punta con corredores segregados y fiscalizados</div></div>
-            <div class="opcion paso" data-paso="4" style="--c:var(--amarillo)"><h3>Filadelfia</h3><p>Chestnut St: un tramo con carril rojo frente a un tramo gemelo sin pintura, con las mismas rutas.</p><div class="dato"><b>+12,3 %</b>más rápido con carril; el tramo de control, 35,8 % más lento</div></div>
+          <header class="titulo-marco"><h2>Ese retraso cuesta unos $<span data-dato="economia.costo_anio_bill" data-fmt="dec1">2,5</span> billones al año</h2><p class="kicker">El problema en pesos</p></header>
+          <div class="ecuacion">
+            <div class="termino"><b data-dato="economia.retraso_bus_h">35.868</b><span>bus-horas perdidas por día hábil</span></div>
+            <i>×</i>
+            <div class="termino"><b>$<span data-dato="economia.supuestos.costo_bus_h_miles">201</span> mil</b><span>lo que cuesta operar un bus una hora</span></div>
+            <i>=</i>
+            <div class="termino"><b>$<span data-dato="economia.operacion_dia_milmill" data-fmt="dec1">7,2</span> mil M</b><span>de operación al día</span></div>
+            <span class="salto"></span>
+            <div class="termino paso" data-paso="1"><b><span data-dato="economia.pasajero_h_miles">651</span> mil</b><span>horas de pasajeros a bordo</span></div>
+            <i class="paso" data-paso="1">×</i>
+            <div class="termino paso" data-paso="1"><b>$<span data-dato="economia.supuestos.valor_tiempo_miles" data-fmt="dec1">4,2</span> mil</b><span>lo que vale una hora de un pasajero</span></div>
+            <i class="paso" data-paso="1">=</i>
+            <div class="termino paso" data-paso="1"><b>$<span data-dato="economia.gente_dia_milmill" data-fmt="dec1">2,7</span> mil M</b><span>de tiempo de la gente al día</span></div>
+            <span class="salto"></span>
+            <div class="termino total paso" data-paso="2"><b>$<span data-dato="economia.costo_dia_milmill" data-fmt="dec1">9,9</span> mil M por día hábil</b><span>× <span data-dato="economia.supuestos.dias_habiles">250</span> días al año. Solo la operación es el <span data-dato="economia.pct_costo_sitp">26</span>&nbsp;% de lo que cuesta el SITP</span></div>
           </div>
-          <p class="pie">Bogotá abrió su feed GTFS-Realtime el 4 de noviembre de 2026. Hay mapas en vivo, pero nadie analiza el archivo histórico.</p>
+          <div class="tarjeta oro paso" data-paso="3"><h3>Es un techo, no una meta</h3><p>Ningún bus va libre todo el día: no se puede recuperar todo. La pregunta útil es <b>dónde</b> se recupera más tiempo por cada peso invertido.</p></div>
+          <p class="pie" data-fuentes></p>
         </div>
-        <aside class="nota">Fuentes: MTA y Contraloría de Nueva York, Cal-ITP/Caltrans, González et al. (J. Urban Economics 2025), Ciudad de Filadelfia. Detalle en investigacion/reports.</aside>
+        <aside class="nota">Los supuestos están abajo con su fuente. Si se cambian, cambia la cifra, no el orden de las calles: el ranking no depende del precio.</aside>
       </section>
 
-      <!-- ============================== 1 · DATOS Y RAY ============================== -->
-      <section class="frame grande" id="datos" data-x="3900" data-y="1600" data-cap="1" data-titulo="Los datos y su calidad" data-grafico="calor">
+      <section class="frame" id="plan" data-x="5850" data-y="0" data-cap="0" data-titulo="Cómo lo resolvemos">
+        <div class="frame-in dividido">
+          <header class="titulo-marco"><h2>Un problema de optimización: el presupuesto alcanza para pocas calles</h2><p class="kicker">Cómo lo resolvemos</p></header>
+          <div class="texto">
+            <div class="concepto"><span class="etq">Elegir las calles</span>
+              <div class="modelo">
+                <p>maximizar <b>Σ ahorro<sub>i</sub> · x<sub>i</sub></b> <small>bus-horas recuperadas por día</small></p>
+                <p>sujeto a <b>Σ costo<sub>i</sub> · x<sub>i</sub> ≤ presupuesto</b>, x<sub>i</sub> ∈ {0, 1}</p>
+                <p class="muted">i = cada celda de 250 m de calle donde pasan buses</p>
+              </div>
+            </div>
+            <div class="tarjeta azul paso" data-paso="1"><h3>La solución es una lista</h3><p>Todas las celdas miden lo mismo, así que cuestan lo mismo. Entonces el óptimo, para cualquier presupuesto, es tratar las celdas <b>en orden de ahorro</b> hasta que se acabe la plata.</p></div>
+          </div>
+          <div class="texto">
+            <ol class="plan">
+              <li class="paso" data-paso="2"><b>Medir</b> el retraso en cada tramo y hora con <span data-dato="completo.posiciones_m" data-fmt="dec1">80,9</span> M de posiciones GPS. Es el trabajo pesado: Ray.</li>
+              <li class="paso" data-paso="3"><b>Estimar el ahorro</b> de un carril con lo que midieron Bogotá y otras ciudades: +10&nbsp;% a +20&nbsp;% de velocidad.</li>
+              <li class="paso" data-paso="4"><b>Ordenar y valorar</b>: cuántas horas y cuántos pesos devuelve cada kilómetro tratado.</li>
+              <li class="paso" data-paso="5"><b>Dos preguntas más</b> con los mismos datos: cuánto tiempo reservar (el horario) y a quién le cuesta más (la equidad).</li>
+            </ol>
+          </div>
+        </div>
+        <aside class="nota">Es un problema de la mochila con pesos iguales: el voraz es óptimo. La simplificación: cada celda se trata sola; un carril real es un corredor continuo.</aside>
+      </section>
+
+      <!-- ============================== 1 · CÓMO LO MEDIMOS ============================== -->
+      <section class="frame grande" id="datos" data-x="5850" data-y="1600" data-cap="1" data-titulo="Los datos" data-grafico="calor">
         <div class="frame-in">
           <div class="aws-cabecera">
-            <header class="titulo-marco"><h2><span data-dato="completo.dias">12</span> días de feed, <span data-dato="completo.posiciones_m" data-fmt="dec1">80,9</span> M de posiciones</h2><p class="kicker">Datos y Ray · los datos</p></header>
+            <header class="titulo-marco"><h2><span data-dato="completo.dias">12</span> días de GPS, <span data-dato="completo.posiciones_m" data-fmt="dec1">80,9</span> M de posiciones</h2><p class="kicker">Cómo lo medimos · los datos</p></header>
             <div class="leyenda-linea"><span><span class="sw grad"></span> buses distintos por hora</span><span><span class="sw rayas"></span> sin reportes</span></div>
           </div>
           <div class="aws-paso">
-            <b class="paso" data-paso="0"><span data-dato="completo.archivos">27.599</span> capturas, <span data-dato="completo.gb" data-fmt="dec1">3,5</span> GB, del 12 al 23 de noviembre. Hora de Bogotá; cada fila es un día. Lo rayado: horas sin reportes, el feed se congeló.</b>
-            <span class="paso" data-paso="0"><b data-dato="calidad.duplicado_pct" data-fmt="pct1">29,0 %</b> de las posiciones leídas son repetidas. Cada bus da un dato nuevo cada ~52 s; el reporte llega con <b data-dato="calidad.edad_mediana_s">49</b> s de antigüedad (mediana).</span>
-            <span class="paso" data-paso="1">① Desde el 18 el feed trae más buses: de <b data-dato="calidad.buses_antes">6.448</b> a <b data-dato="calidad.buses_despues">8.325</b> en la hora con más buses de un día hábil.</span>
-            <span class="paso" data-paso="2">② Sábados, domingos y el festivo del 16 se analizan aparte, por tipo de día.</span>
+            <b class="paso" data-paso="0">El feed abierto de TransMilenio, guardado cada 20 s del 12 al 23 de noviembre: <span data-dato="completo.archivos">27.599</span> capturas, <span data-dato="completo.gb" data-fmt="dec1">3,5</span> GB. Cada fila es un día; lo rayado, horas en que el feed se congeló.</b>
+            <span class="paso" data-paso="1">① Cada bus reporta cada ~52 s y <b data-dato="calidad.duplicado_pct" data-fmt="pct1">29,0&nbsp;%</b> de lo leído es repetido: se limpia antes de medir.</span>
+            <span class="paso" data-paso="2">② Los rankings usan solo días hábiles; sábados, domingos y el festivo del 16 van aparte.</span>
           </div>
           <div class="grafico ancho" data-svg></div>
         </div>
-        <aside class="nota">La limpieza viene del proyecto anterior: se quitan reportes de más de 5 minutos (zombis) y los duplicados por (vehículo, timestamp). El cambio del 18 es del feed, no del archivador.</aside>
+        <aside class="nota">Desde el 18 el feed trae más buses (de unos 6.400 a 8.300 en la hora pico): es un cambio del feed, no de la ciudad. Se quitan reportes de más de 5 min (zombis) y duplicados.</aside>
       </section>
 
-      <section class="frame grande" id="pipeline" data-x="5850" data-y="1600" data-cap="1" data-titulo="El pipeline en Ray" data-grafico="pipeline">
+      <section class="frame grande" id="pipeline" data-x="7800" data-y="1600" data-cap="1" data-titulo="El pipeline en Ray" data-grafico="pipeline">
         <div class="frame-in">
           <div class="aws-cabecera">
-            <header class="titulo-marco"><h2>El pipeline en Ray</h2><p class="kicker">Datos y Ray · cuatro etapas medidas por separado</p></header>
-            <p class="muted">Corrida completa: <b data-dato="completo.total_min">65</b> min con <b data-dato="completo.cpus">6</b> CPUs para los <b data-dato="completo.dias">12</b> días.</p>
+            <header class="titulo-marco"><h2>De puntos GPS a minutos perdidos por calle</h2><p class="kicker">Cómo lo medimos · cuatro etapas en Ray</p></header>
+            <p class="muted">Los 12 días en <b data-dato="completo.total_min">57</b> min con <b data-dato="completo.cpus">6</b> CPUs.</p>
           </div>
           <div class="diagrama" data-svg></div>
           <div class="concepto-pila">
-            <div class="concepto" data-concepto="0"><span class="etq">Entrada</span><p>Las capturas tal como las dejó el archivador. Nunca se modifican: todo lo demás se vuelve a generar.</p></div>
-            <div class="concepto" data-concepto="1"><span class="etq">Ray Data · paralelismo de datos</span><p>Un archivo no depende de otro. <code>map_batches</code> decodifica el protobuf y quita los reportes de más de 5 min. Escribe Parquet por día y <code>crc32(vehicle_id) % 64</code>: cada partición trae la película completa de sus buses.</p></div>
-            <div class="concepto" data-concepto="2"><span class="etq">Ray Core · object store</span><p>Una tarea por día × partición; las geometrías se suben una vez con <code>ray.put</code>. Cada ruta tiene un solo shape de ida y vuelta, así que el bus se empareja solo con los segmentos que van en su sentido de marcha.</p></div>
-            <div class="concepto" data-concepto="3"><span class="etq">Una tarea por cubo de rutas</span><p>Los recorridos ya salen repartidos por cubo de rutas, así que tramos y confiabilidad no necesitan otro shuffle. Retraso = tiempo en el tramo − tiempo en flujo libre (p5 de ese tramo).</p></div>
-            <div class="concepto" data-concepto="4"><span class="etq">Salida</span><p><b data-dato="completo.filas.posiciones">80.855.099</b> posiciones → <b data-dato="completo.filas.recorridos">22.997.744</b> recorridos de tramo → <b data-dato="completo.filas.tramos">1.799.983</b> filas tramo × hora y <b data-dato="completo.filas.confiabilidad">1.375.007</b> pares de paradas × hora.</p></div>
+            <div class="concepto" data-concepto="0"><span class="etq">Entrada</span><p>Las capturas tal como las dejó el archivador. No se modifican: todo lo demás se vuelve a generar.</p></div>
+            <div class="concepto" data-concepto="1"><span class="etq">Leer y limpiar · Ray Data</span><p>Cada captura se procesa sola: <code>map_batches</code> decodifica el protobuf y quita duplicados y reportes viejos. Sale Parquet por día y por grupo de buses.</p></div>
+            <div class="concepto" data-concepto="2"><span class="etq">Ubicar cada bus en su ruta · Ray Core</span><p>Una tarea por día × grupo de buses; las geometrías de las rutas se comparten una vez con <code>ray.put</code>. Es la etapa cara: más de la mitad del tiempo.</p></div>
+            <div class="concepto" data-concepto="3"><span class="etq">Medir el retraso · una tarea por grupo de rutas</span><p>Tiempo de cada bus en cada tramo de 500 m frente al tiempo libre de ese tramo. Lo mismo entre paradas, para el horario.</p></div>
+            <div class="concepto" data-concepto="4"><span class="etq">Salida</span><p><b data-dato="completo.filas.posiciones">80.855.099</b> posiciones → <b data-dato="completo.filas.recorridos">22.997.744</b> pasos por tramo → <b data-dato="completo.filas.tramos">1.799.983</b> filas tramo × hora y <b data-dato="completo.filas.confiabilidad">1.375.007</b> pares de paradas × hora.</p></div>
           </div>
         </div>
-        <aside class="nota">El map-matching es la etapa cara: se lleva más de la mitad del tiempo. El emparejamiento por sentido de marcha es lo nuevo frente al proyecto anterior.</aside>
+        <aside class="nota">Cada ruta tiene un solo shape de ida y vuelta, así que el bus se empareja solo con los segmentos que van en su sentido de marcha. Eso es lo nuevo frente al proyecto anterior.</aside>
       </section>
 
-      <section class="frame" id="validacion" data-x="7800" data-y="1600" data-cap="1" data-titulo="Validación">
-        <div class="frame-in">
-          <header class="titulo-marco"><h2>¿Podemos creerle a la medición?</h2><p class="kicker">Datos y Ray · validación</p></header>
-          <div class="metricas">
-            <div class="metrica paso" data-paso="1" style="--c:var(--azul-tm)"><h3>Error de medición</h3><div class="formula">buses sintéticos de velocidad<br/>conocida, muestreados cada 52 s</div><p>¿Cuánto se equivoca la velocidad por tramo con un reporte cada 52 s?</p><span class="valor">+<b data-dato="validacion.sintetico_52s.sesgo_pct" data-fmt="dec1">0,5</b> % <small>de sesgo · error mediano <span data-dato="validacion.sintetico_52s.mediana_pct" data-fmt="pct1">8,4 %</span>, p90 <span data-dato="validacion.sintetico_52s.p90_pct" data-fmt="pct1">21,8 %</span>, en <span data-dato="validacion.sintetico_52s.tramos">3.601</span> tramos</small></span></div>
-            <div class="metrica paso" data-paso="2" style="--c:var(--amarillo)"><h3>Contra la cifra oficial</h3><div class="formula">velocidad comercial medida<br/>vs. TransMilenio 2024</div><p>Troncal <b data-dato="validacion.magnitudes_vs_2024.troncal.medida" data-fmt="dec1">21,7</b> vs 25,2 · Dual <b data-dato="validacion.magnitudes_vs_2024.dual.medida" data-fmt="dec1">17,9</b> vs 19,8 · Alimentador <b data-dato="validacion.magnitudes_vs_2024.alimentador.medida" data-fmt="dec1">14,3</b> vs 17,5 km/h</p><span class="valor"><b>10–18 %</b> <small>por debajo de la cifra oficial: mismo orden de magnitud</small></span></div>
-            <div class="metrica paso" data-paso="3" style="--c:var(--tm-rojo)"><h3>Estabilidad del ranking</h3><div class="formula">días 12, 13, 17 vs 18, 19, 20, 23<br/>Spearman sobre el top 200</div><p>¿Salen las mismas celdas en las dos mitades del periodo?</p><span class="valor"><b data-dato="validacion.estabilidad_mixto.spearman_top200" data-fmt="dec2">0,63</b> · <b data-dato="validacion.estabilidad_exclusivo.spearman_top200" data-fmt="dec2">0,73</b> <small>mixto · exclusivo; del top 20 se repiten <span data-dato="validacion.estabilidad_mixto.solape_top20">10</span> y <span data-dato="validacion.estabilidad_exclusivo.solape_top20">12</span></small></span></div>
-          </div>
-        </div>
-        <aside class="nota">Medimos por debajo de la cifra oficial en los tres sistemas. La comparación del pipeline no incluye el zonal. El ranking es estable pero no idéntico: la mitad del top 20 cambia entre semanas.</aside>
-      </section>
-
-      <section class="frame" id="speedup" data-x="7800" data-y="2850" data-cap="1" data-titulo="Speedup y Amdahl" data-grafico="speedup">
+      <section class="frame" id="speedup" data-x="9750" data-y="1600" data-cap="1" data-titulo="Speedup" data-grafico="speedup">
         <div class="frame-in dividido">
-          <header class="titulo-marco"><h2>Cuánto se gana con más núcleos</h2><p class="kicker">Datos y Ray · escalamiento fuerte</p></header>
+          <header class="titulo-marco"><h2>Con 8 workers, el mismo día se procesa 2,8 veces más rápido</h2><p class="kicker">Cómo lo medimos · escalamiento fuerte</p></header>
           <div class="texto">
-            <p>Speedup = tiempo secuencial / tiempo con n workers. Eficiencia = speedup / n.</p>
+            <p>Speedup = tiempo en un solo proceso / tiempo con n workers, sobre el mismo día hábil.</p>
             <ul class="mini-conceptos">
-              <li class="paso" data-paso="1">La curva de Amdahl pone el techo según la fracción paralela p.</li>
-              <li class="paso" data-paso="2">La línea roja es la medición: el mismo día hábil, en un proceso y con Ray de 1 a 8 workers.</li>
+              <li class="paso" data-paso="1">Amdahl pone el techo: solo una parte del trabajo es paralela.</li>
+              <li class="paso" data-paso="2">La línea roja es la medición, de 1 a 8 workers en un portátil de 4 núcleos.</li>
             </ul>
-            <div class="tarjeta oro"><p><b>Línea base honesta:</b> el mismo código en un solo proceso, sin Ray (<code>--modo secuencial</code>), no Ray con 1 worker.</p></div>
             <div data-tabla-bench></div>
           </div>
           <div class="grafico" data-svg></div>
         </div>
-        <aside class="nota">La p de Amdahl se despeja del speedup medido con el máximo de workers. Lo que no escala: arrancar Ray, leer del disco y escribir Parquet. Pasa el mouse por los puntos para ver tiempo y eficiencia.</aside>
+        <aside class="nota">La línea base es el mismo código en un solo proceso, sin Ray. Lo que no escala: arrancar Ray, leer del disco y escribir Parquet. Por encima de 4 workers solo se gana con hyperthreading.</aside>
       </section>
 
-      <!-- ============================== 2 · DÓNDE SE FRENAN ============================== -->
-      <section class="frame" id="mapa" data-x="7800" data-y="4600" data-cap="2" data-titulo="Mapa: dónde se frenan" data-tres="velocidades">
+      <section class="frame" id="validacion" data-x="9750" data-y="2850" data-cap="1" data-titulo="Validación">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>¿Podemos creerle a la medición?</h2><p class="kicker">Cómo lo medimos · validación</p></header>
+          <div class="metricas">
+            <div class="metrica paso" data-paso="1" style="--c:var(--azul-tm)"><h3>Error de medición</h3><div class="formula">buses simulados de velocidad<br/>conocida, un reporte cada 52 s</div><span class="valor">+<b data-dato="validacion.sintetico_52s.sesgo_pct" data-fmt="dec1">0,5</b> % <small>de sesgo · error mediano por tramo <span data-dato="validacion.sintetico_52s.mediana_pct" data-fmt="pct1">8,4&nbsp;%</span></small></span><p>Sirve para comparar calles y horas, no un tramo aislado.</p></div>
+            <div class="metrica paso" data-paso="2" style="--c:var(--amarillo)"><h3>Contra la cifra oficial</h3><div class="formula">velocidad comercial medida<br/>vs. TransMilenio 2024</div><span class="valor"><b>10–18&nbsp;%</b> <small>por debajo: troncal <span data-dato="validacion.magnitudes_vs_2024.troncal.medida" data-fmt="dec1">21,8</span> vs 25,2 km/h</small></span><p>Mismo orden de magnitud.</p></div>
+            <div class="metrica paso" data-paso="3" style="--c:var(--tm-rojo)"><h3>¿La lista se repite?</h3><div class="formula">primera mitad de los días hábiles<br/>vs. segunda mitad</div><span class="valor"><b data-dato="validacion.estabilidad_mixto.spearman_top200" data-fmt="dec2">0,63</b> <small>de correlación de Spearman; del top 20 se repiten <span data-dato="validacion.estabilidad_mixto.solape_top20">10</span></small></span><p>Estable, pero conviene más días antes de invertir.</p></div>
+          </div>
+        </div>
+        <aside class="nota">La mitad del top 20 cambia entre semanas: la lista sirve para priorizar estudios de corredor, no para firmar contratos con 12 días de datos.</aside>
+      </section>
+
+      <!-- ============================== 2 · DÓNDE INVERTIR ============================== -->
+      <section class="frame" id="mapa" data-x="9750" data-y="4600" data-cap="2" data-titulo="Dónde se frenan" data-tres="velocidades">
         <div class="frame-in dividido">
-          <header class="titulo-marco"><h2>Dónde se frenan los buses</h2><p class="kicker">Dónde se frenan · atlas por tramo</p></header>
+          <header class="titulo-marco"><h2>Dónde se frenan los buses</h2><p class="kicker">Dónde invertir · el mapa</p></header>
           <div class="texto">
-            <p>Cada punto es una celda de 250 m. El color es la velocidad mediana de los buses en el pico (6–8 y 17–19 h) de los días hábiles.</p>
+            <p>Cada punto es una celda de 250 m. El color es la velocidad en el pico (6–8 y 17–19 h) de los días hábiles.</p>
             <p class="leyenda-linea"><span><span class="sw grad" style="background:linear-gradient(90deg,#c4c5c6,#ED3237)"></span> 25 km/h o más → detenido</span></p>
-            <p class="paso" data-paso="1">Las celdas se levantan según las bus-horas que se pierden ahí cada día hábil frente al flujo libre.</p>
+            <p class="paso" data-paso="1">La altura es lo que se pierde ahí cada día hábil, en bus-horas.</p>
             <div class="cifras pequeñas paso" data-paso="1">
-              <div><b data-dato="resumen.bus_horas_mixto">31.307</b><span>bus-horas por día en tráfico mixto (zonal y alimentador)</span></div>
-              <div><b data-dato="resumen.bus_horas_exclusivo">4.823</b><span>en carril exclusivo (troncal y dual)</span></div>
+              <div><b data-dato="resumen.bus_horas_mixto">31.075</b><span>bus-horas por día en tráfico mixto (zonal y alimentador)</span></div>
+              <div><b data-dato="resumen.bus_horas_exclusivo">4.793</b><span>en carril exclusivo (troncal y dual)</span></div>
             </div>
             <p class="muted">Arrastra para girar. Las líneas del piso son las troncales.</p>
           </div>
           <div class="lienzo"><canvas data-canvas></canvas><div class="etiquetas-3d"></div></div>
         </div>
-        <aside class="nota">Bus-horas, no persona-horas: el feed no trae pasajeros. El flujo libre de cada tramo es su p5 de duración en todo el periodo, como en Aemmer et al. (2022).</aside>
+        <aside class="nota">El 87&nbsp;% de las bus-horas perdidas está en tráfico mixto: ahí es donde un carril cambia algo. La troncal ya tiene carril propio y pide otras soluciones (estaciones, semáforos).</aside>
       </section>
 
-      <section class="frame grande" id="ranking-mixto" data-x="9750" data-y="4600" data-cap="2" data-titulo="Ranking: tráfico mixto" data-grafico="rankingMixto">
+      <section class="frame" id="efecto" data-x="11700" data-y="4600" data-cap="2" data-titulo="Cuánto ahorra un carril">
+        <div class="frame-in">
+          <header class="titulo-marco"><h2>¿Cuánto ahorra un carril? Lo que midieron Bogotá y otras ciudades</h2><p class="kicker">Dónde invertir · el efecto</p></header>
+          <div class="opciones">
+            <div class="opcion" style="--c:var(--amarillo)"><h3>Bogotá</h3><p>Carril de la Séptima con cámaras, primer mes de 2025, según la Secretaría de Movilidad (sin método publicado).</p><div class="dato"><b>+11&nbsp;%</b>de velocidad en el día; +17&nbsp;% en el pico, sentido de mayor carga</div></div>
+            <div class="opcion" style="--c:var(--azul-tm)"><h3>Nueva York</h3><p>El Contralor midió las rutas donde la ciudad pintó carriles nuevos en 2019.</p><div class="dato"><b>+8,4&nbsp;%</b>de velocidad; hasta +30&nbsp;% donde se restringió el carro</div></div>
+            <div class="opcion" style="--c:var(--verde-tm)"><h3>Filadelfia</h3><p>Chestnut St: un tramo con carril rojo frente a un tramo gemelo sin pintura, con las mismas rutas.</p><div class="dato"><b>+12,3&nbsp;%</b>más rápido con carril; el tramo de control, 35,8&nbsp;% más lento</div></div>
+            <div class="opcion" style="--c:var(--tm-rojo)"><h3>Santiago</h3><p>GPS de 500 rutas, corredores tratados frente a corredores de control durante años.</p><div class="dato"><b>≈ +20&nbsp;%</b>con corredores segregados y fiscalizados; la pintura sola no muestra efecto</div></div>
+          </div>
+          <p class="pie paso" data-paso="1">Usamos <b>+10&nbsp;%</b> (pesimista) y <b>+20&nbsp;%</b> (optimista) de velocidad en la celda tratada, sin bajar nunca del tiempo libre.</p>
+        </div>
+        <aside class="nota">Fuentes: Secretaría de Movilidad en El Espectador (2025), Contraloría de Nueva York (2025), Ciudad de Filadelfia (2025), Gonzalez et al. (J. Urban Economics 2025). La cifra de Bogotá es de la Secretaría y no publica método. Con nuestro archivo no se puede medir porque no hay datos de antes del carril. Lo que sí vemos hoy: en el pico, las rutas van a 14,0 km/h dentro del carril de la Séptima y a 14,9 fuera; en la Carrera 13, a 12,1 y 14,1. Es descriptivo: los carriles están en el centro, donde todo es más lento.</aside>
+      </section>
+
+      <section class="frame grande" id="optimo" data-x="13650" data-y="4600" data-cap="2" data-titulo="Cuánto devuelve cada km" data-grafico="optimo">
         <div class="frame-in">
           <div class="aws-cabecera">
-            <header class="titulo-marco"><h2>Tráfico mixto: dónde se pierden más bus-horas</h2><p class="kicker">Dónde se frenan · zonal y alimentador</p></header>
-            <p class="muted">Celdas de 250 m. Retraso de todos los buses que pasan por la celda en un día hábil, frente a su flujo libre.</p>
+            <header class="titulo-marco"><h2>Los primeros <span data-dato="economia.escenarios.0.km">10</span> km devuelven <span data-dato="economia.escenarios.0.bus_h_bajo">350</span> a <span data-dato="economia.escenarios.0.bus_h_alto">650</span> horas de bus al día</h2><p class="kicker">Dónde invertir · la solución óptima</p></header>
+            <p class="muted">Celdas de tráfico mixto tratadas en orden de ahorro: la curva es la mejor respuesta para cada presupuesto.</p>
           </div>
           <div class="grafico ancho" data-svg></div>
-          <p class="pie paso" data-paso="1">Las líneas negras son el intervalo del 95 % al remuestrear días hábiles completos. Estas celdas son las candidatas a carril preferencial o prioridad semafórica.</p>
+          <div data-escenarios class="paso" data-paso="1"></div>
         </div>
-        <aside class="nota">El ranking de tráfico mixto va aparte del de carril exclusivo porque piden intervenciones distintas. La celda 1 junta 56 rutas: es un punto donde se cruzan muchas líneas zonales.</aside>
+        <aside class="nota">La curva se aplana: el kilómetro 1 devuelve mucho más que el 100. Por eso importa el orden. El costo por kilómetro es el de un carril preferencial con pintura, separadores y señales, no el de una troncal.</aside>
       </section>
 
-      <section class="frame grande" id="ranking-exclusivo" data-x="11700" data-y="4600" data-cap="2" data-titulo="Ranking: carril exclusivo" data-grafico="rankingExclusivo">
+      <section class="frame grande" id="ranking" data-x="13650" data-y="5850" data-cap="2" data-titulo="Por dónde empezar" data-grafico="rankingMixto">
         <div class="frame-in">
           <div class="aws-cabecera">
-            <header class="titulo-marco"><h2>Carril exclusivo: dónde se frena la troncal</h2><p class="kicker">Dónde se frenan · troncal y dual</p></header>
-            <p class="muted">La misma medida para los buses que ya tienen carril propio.</p>
+            <header class="titulo-marco"><h2>Por dónde empezar: las 10 celdas que más pierden</h2><p class="kicker">Dónde invertir · la lista</p></header>
+            <p class="muted">Bus-horas perdidas por día hábil en cada celda de 250 m de tráfico mixto, con las rutas que más pierden ahí.</p>
           </div>
           <div class="grafico ancho" data-svg></div>
-          <p class="pie paso" data-paso="1">Las líneas negras son el intervalo del 95 % por bootstrap de días. Aquí el bus ya tiene su carril: estas celdas piden otro tipo de intervención.</p>
+          <p class="pie paso" data-paso="1">Las líneas negras son el intervalo del 95&nbsp;% al remuestrear días hábiles completos. La primera, en Usme, junta 56 rutas zonales.</p>
         </div>
-        <aside class="nota">En carril exclusivo se pierden muchas menos bus-horas que en tráfico mixto. El ranking es algo más estable entre semanas (Spearman 0,73 frente a 0,63).</aside>
+        <aside class="nota">Es la misma lista que ordena la curva anterior. En la troncal el primer lugar es la Caracas en el centro, con 5 a 6 km/h en el pico (resultados/ranking_exclusivo.csv).</aside>
       </section>
 
-      <section class="frame" id="carriles" data-x="11700" data-y="5850" data-cap="2" data-titulo="Séptima y Carrera 13" data-grafico="carriles">
+      <!-- ============================== 3 · HORARIO Y EQUIDAD ============================== -->
+      <section class="frame" id="reservar" data-x="13650" data-y="7600" data-cap="3" data-titulo="Cuánto reservar" data-grafico="reservar">
         <div class="frame-in dividido">
-          <header class="titulo-marco"><h2>Séptima y Carrera 13: dentro y fuera del carril</h2><p class="kicker">Dónde se frenan · carriles preferenciales</p></header>
+          <header class="titulo-marco"><h2>El pasajero paga la incertidumbre: reserva un 18&nbsp;% a 25&nbsp;% más de tiempo</h2><p class="kicker">Horario y equidad · confiabilidad</p></header>
           <div class="texto">
-            <p>Para las rutas que recorren el carril, velocidad mediana en sus tramos dentro del carril frente al resto de la misma ruta, en los mismos días.</p>
-            <p>En el pico, dentro del carril van más lento: <b data-dato="carriles.septima.pico.dentro.v_p50" data-fmt="dec1">14,0</b> vs <b data-dato="carriles.septima.pico.fuera.v_p50" data-fmt="dec1">14,9</b> km/h en la Séptima y <b data-dato="carriles.carrera13.pico.dentro.v_p50" data-fmt="dec1">12,1</b> vs <b data-dato="carriles.carrera13.pico.fuera.v_p50" data-fmt="dec1">14,1</b> en la Carrera 13.</p>
-            <p class="leyenda-linea"><span><span class="sw" style="background:var(--tm-rojo)"></span> dentro del carril</span><span><span class="sw" style="background:var(--ud-plata)"></span> resto de la misma ruta</span></p>
-            <div class="tarjeta rojo paso" data-paso="1"><h3>Descriptivo, no causal</h3><p>No hay datos de antes de los carriles (Séptima: mayo de 2025; Carrera 13: octubre de 2025). Esto no dice si el carril funcionó; dice cómo andan hoy esas rutas dentro y fuera de él.</p></div>
-          </div>
-          <div class="grafico" data-svg></div>
-        </div>
-        <aside class="nota">Una explicación posible, sin probar: los tramos del carril están en el centro, con más cruces y paradas. Para medir el efecto haría falta un antes y un después, como Santiago, o un tramo de control, como Filadelfia.</aside>
-      </section>
-
-      <!-- ============================== 3 · CUÁNTO RESERVAR ============================== -->
-      <section class="frame" id="reservar" data-x="11700" data-y="7600" data-cap="3" data-titulo="Cuánto reservar" data-grafico="reservar">
-        <div class="frame-in dividido">
-          <header class="titulo-marco"><h2>Cuánto tiempo reservar entre dos paradas</h2><p class="kicker">Cuánto reservar · confiabilidad</p></header>
-          <div class="texto">
-            <p>Para llegar a tiempo 19 de cada 20 veces no sirve el promedio: hay que planear con el p95.</p>
-            <div class="concepto"><span class="etq">Buffer Time Index</span><p><code>BTI = (p95 − media) / media</code>: lo que hay que sumar al tiempo medio. Mediana de los pares de paradas en el pico de los días hábiles:</p></div>
+            <p>Para llegar a tiempo 19 de cada 20 veces no sirve el promedio: hay que salir con el p95. En un viaje de 40 min eso son 7 a 10 min extra, todos los días.</p>
+            <div class="concepto"><span class="etq">Buffer Time Index</span><p><code>BTI = (p95 − media) / media</code>. Mediana de los pares de paradas en el pico de los días hábiles:</p></div>
             <div class="por-dia"><div data-bti></div></div>
-            <p class="muted"><span data-dato="resumen.confiabilidad.pares_hora">1.375.007</span> pares de paradas × hora, por ruta y tipo de día.</p>
           </div>
           <div class="texto">
-            <div class="paso" data-paso="1"><h3 class="sub">Tráfico mixto: los que más colchón piden</h3><div data-pares="mixto"></div></div>
-            <div class="paso" data-paso="2"><h3 class="sub">Carril exclusivo</h3><div data-pares="exclusivo"></div></div>
-            <p class="pie">Pico de días hábiles, un par por ruta, viajes de 10 min o más.</p>
+            <div class="paso" data-paso="1"><h3 class="sub">Los viajes que más colchón piden</h3><div data-pares="mixto"></div></div>
+            <p class="pie">Pico de días hábiles, un par por ruta, viajes de 10 min o más. <span data-dato="resumen.confiabilidad.pares_hora">1.270.840</span> pares de paradas × hora en total.</p>
           </div>
         </div>
-        <aside class="nota">Los extremos de la tabla hay que revisarlos uno por uno antes de publicarlos: un p95 varias veces mayor que la mediana puede venir de pocos viajes muy malos.</aside>
+        <aside class="nota">Ese colchón es tiempo perdido aunque el bus llegue a tiempo: también vale plata. Los extremos de la tabla hay que revisarlos uno por uno antes de publicarlos.</aside>
       </section>
 
-      <section class="frame" id="walkforward" data-x="13650" data-y="7600" data-cap="3" data-titulo="Walk-forward y horario" data-grafico="walkforward">
+      <section class="frame" id="horario" data-x="15600" data-y="7600" data-cap="3" data-titulo="El horario" data-grafico="walkforward">
         <div class="frame-in dividido">
-          <header class="titulo-marco"><h2>¿Sirve el colchón en días que no vio?</h2><p class="kicker">Cuánto reservar · validación walk-forward</p></header>
+          <header class="titulo-marco"><h2>El horario se queda corto en unos tramos y le sobra en otros</h2><p class="kicker">Horario y equidad · el horario oficial</p></header>
           <div class="texto">
-            <p>El p95 se calcula con 4 días hábiles (12, 13, 17 y 18) y se prueba con otros 3 (19, 20 y 23): <b data-dato="walkforward.viajes_prueba_m" data-fmt="dec1">6,0</b> M de viajes.</p>
-            <div class="tarjeta rojo paso" data-paso="1"><h3><span data-dato="walkforward.cobertura_pct" data-fmt="pct1">87,3 %</span>, no 95 %</h3><p>El colchón cubre menos de lo que promete: 92 % a las 7 y 8 h, 85 % a las 18 y 19 h. Antes de publicarlo hay que entrenarlo con más días.</p></div>
-            <div class="por-dia paso" data-paso="2"><h3 class="sub">El horario del GTFS, días hábiles</h3><div data-holgura></div><p class="pie">Corto: la mediana observada supera el tiempo programado. Le sobra: el programado supera el p80 observado.</p></div>
+            <div class="por-dia"><h3 class="sub">Horario del GTFS frente a lo observado, días hábiles</h3><div data-holgura></div><p class="pie">Corto: la mediana observada supera lo programado (el bus llega tarde). Le sobra: lo programado supera el p80 (el bus espera; flota ociosa).</p></div>
+            <div class="tarjeta rojo paso" data-paso="1"><h3>Un colchón de 4 días no alcanza</h3><p>El p95 calculado con 4 días hábiles cubre el <span data-dato="walkforward.cobertura_pct" data-fmt="pct1">87,5&nbsp;%</span> de los viajes de los 3 siguientes, no el 95&nbsp;% (a la derecha, por hora). Antes de publicarlo hay que medir más días.</p></div>
           </div>
           <div class="grafico" data-svg></div>
         </div>
-        <aside class="nota">Los días de prueba no tienen la mañana completa: no hay reportes hasta las 9 h el 19, las 7 h el 20 y las 8 h el 23, así que el pico de la mañana pesa menos. Una causa probable: cuatro días de entrenamiento son pocos para un p95 por par de paradas y hora. El resultado se reporta tal cual: no cumple la meta.</aside>
+        <aside class="nota">Reasignar tiempo del horario de donde sobra a donde falta es otra optimización, sin comprar un bus. Los días de prueba no tienen la mañana completa (el feed se congeló), así que el pico de la mañana pesa menos.</aside>
       </section>
 
-      <!-- ============================== 4 · CIERRE ============================== -->
-      <section class="frame" id="accesibilidad" data-x="11700" data-y="10600" data-cap="4" data-titulo="Accesibilidad al empleo" data-grafico="accesibilidad">
+      <section class="frame" id="accesibilidad" data-x="17550" data-y="7600" data-cap="3" data-titulo="A quién le cuesta más" data-grafico="accesibilidad">
         <div class="frame-in dividido">
-          <header class="titulo-marco"><h2>¿A cuántos empleos llega cada barrio en una hora de bus?</h2><p class="kicker">Tercera solución · horario frente a operación observada, por estrato</p></header>
+          <header class="titulo-marco"><h2>A quién le cuesta más: los barrios de estrato 1 y 2</h2><p class="kicker">Horario y equidad · empleos a una hora de bus</p></header>
           <div class="texto">
-            <p>Tres GTFS de día hábil: el horario oficial, el observado típico (mediana de cada tramo por hora) y el observado lento (p80). Matrices de viaje con r5py desde <b data-dato="accesibilidad.zonas_origen">580</b> zonas de la Encuesta de Movilidad 2023, salidas de 6:30 a 8:30.</p>
-            <div class="tarjeta paso" data-paso="1"><h3>Una brecha de 4 a 5 veces</h3><p>Desde una zona de estrato 1 se alcanza el 11 % de los empleos en 60 min según el horario; desde una de estrato 4, el 51 %.</p></div>
-            <div class="tarjeta rojo paso" data-paso="2"><h3>Los días lentos pesan más abajo</h3><p>En el escenario lento, los estratos 1 y 2 pierden 11 % a 14 % de acceso frente al horario; los estratos 4 a 6, 3 % a 5 %. El horario, en cambio, subestima el día típico (+16 % en la mediana).</p></div>
-            <p class="pie">Empleo aproximado con los viajes a trabajar que llegan a cada zona (EM2023, expandidos; incluye informal). Ray: actores que cargan la red R5 una vez; en este portátil cabe uno solo (cada actor es una JVM con la red completa).</p>
+            <p>Empleos que se alcanzan en 60 min desde cada zona de la Encuesta de Movilidad 2023, saliendo de 6:30 a 8:30, con el horario oficial y con los tiempos que medimos.</p>
+            <div class="tarjeta paso" data-paso="1"><h3>Una brecha de 4 a 5 veces</h3><p>Desde una zona de estrato 1 se llega al 11&nbsp;% de los empleos; desde una de estrato 4, al 51&nbsp;%.</p></div>
+            <div class="tarjeta rojo paso" data-paso="2"><h3>Un día lento pesa más abajo</h3><p>En un día lento (p80), los estratos 1 y 2 pierden 11&nbsp;% a 14&nbsp;% del acceso; los estratos 4 a 6, 3&nbsp;% a 5&nbsp;%. Un carril en el sur rinde más que un carril en el norte.</p></div>
           </div>
           <div class="grafico"><div data-acceso></div></div>
         </div>
-        <aside class="nota">Mediana de las zonas de cada estrato. «Lento» usa el p80 del tiempo de cada tramo a esa hora: un día malo, no el peor. Coincide con lo que se midió en Fortaleza: la variabilidad castiga más a la periferia pobre.</aside>
+        <aside class="nota">Mediana de las zonas de cada estrato. Empleo aproximado con los viajes a trabajar que llegan a cada zona (EM2023, expandidos; incluye informal). Matrices con r5py en actores de Ray; en el portátil cabe uno solo, cada actor es una JVM con la red completa.</aside>
       </section>
 
-      <section class="frame" id="bogota" data-x="13650" data-y="10600" data-cap="4" data-titulo="Qué puede hacer Bogotá">
+      <!-- ============================== 4 · CIERRE ============================== -->
+      <section class="frame" id="bogota" data-x="17550" data-y="9350" data-cap="4" data-titulo="Qué recomendamos">
         <div class="frame-in">
-          <header class="titulo-marco"><h2>Qué puede hacer Bogotá con esto</h2><p class="kicker">Conclusiones</p></header>
+          <header class="titulo-marco"><h2>Qué recomendamos a Bogotá</h2><p class="kicker">Conclusiones</p></header>
           <div class="tres-col">
-            <div class="tarjeta azul paso" data-paso="1"><h3>Priorizar</h3><p>Empezar por las celdas del ranking de tráfico mixto, donde se pierden <b data-dato="resumen.bus_horas_mixto">31.307</b> bus-horas cada día hábil. En Santiago funcionó segregar y fiscalizar, no solo pintar.</p><p class="pie">atlas por tramo y hora</p></div>
-            <div class="tarjeta verde paso" data-paso="2"><h3>Informar</h3><p>Publicar cuánto reservar por par de paradas y hora. Antes, validarlo con más días: hoy cubre <span data-dato="walkforward.cobertura_pct" data-fmt="pct1">87,3 %</span>, no 95 %.</p><p class="pie">confiabilidad</p></div>
-            <div class="tarjeta oro paso" data-paso="3"><h3>Ajustar el horario</h3><p>Según el sistema, el horario se queda corto en el 37–66 % de los pares × hora y le sobra tiempo en el 21–43 %.</p><p class="pie">holgura del GTFS</p></div>
+            <div class="tarjeta azul paso" data-paso="1"><h3>Invertir en orden</h3><p>Tratar primero los <span data-dato="economia.escenarios.0.km">10</span> km de la lista devuelve <b><span data-dato="economia.escenarios.0.bus_h_bajo">350</span>–<span data-dato="economia.escenarios.0.bus_h_alto">650</span></b> bus-horas por día hábil, unos <b>$<span data-dato="economia.escenarios.0.valor_anio_bajo" data-fmt="dec1">0,0</span>–<span data-dato="economia.escenarios.0.valor_anio_alto" data-fmt="dec1">0,0</span> mil millones</b> al año.</p><p class="pie">segregado y fiscalizado, no solo pintura</p></div>
+            <div class="tarjeta verde paso" data-paso="2"><h3>Rehacer el horario</h3><p>Mover tiempo de los tramos donde sobra a los que se quedan cortos, y publicar cuánto reservar por viaje y hora cuando haya más días medidos.</p><p class="pie">sin comprar un bus más</p></div>
+            <div class="tarjeta oro paso" data-paso="3"><h3>Empezar por el sur</h3><p>Los estratos 1 y 2 son los que más acceso pierden en un día lento: a igual ahorro, la celda del sur va primero.</p><p class="pie">equidad</p></div>
           </div>
-          <div class="concepto paso" data-paso="4"><span class="etq">Para el curso</span><p>Cada archivo, cada partición de buses y cada cubo de rutas es independiente: por eso Ray. La etapa cara es el map-matching, <b>32</b> de los <b data-dato="completo.total_min">57</b> min. Con 12 días y sin datos de antes de los carriles, nada de esto es causal.</p></div>
+          <div class="concepto paso" data-paso="4"><span class="etq">Para el curso</span><p>Cada captura, cada grupo de buses y cada grupo de rutas es independiente: por eso Ray. Los 12 días toman <b data-dato="completo.total_min">57</b> min; con 8 workers, un día va 2,8 veces más rápido. Con 12 días y sin datos de antes de los carriles, nada de esto es causal: es una lista para priorizar.</p></div>
         </div>
-        <aside class="nota">El valor no está en el mapa en vivo, que Bogotá ya tiene, sino en archivar el feed y convertirlo en una cifra que alguien pueda usar para decidir.</aside>
+        <aside class="nota">El valor no está en el mapa en vivo, que Bogotá ya tiene, sino en archivar el feed y convertirlo en una decisión: dónde poner el siguiente kilómetro de carril.</aside>
       </section>
 
-      <section class="frame cierre" id="cierre" data-x="15600" data-y="10600" data-cap="4" data-titulo="Gracias">
+      <section class="frame cierre" id="cierre" data-x="19500" data-y="9350" data-cap="4" data-titulo="Gracias">
         <!-- Maqueta de la plantilla UD: cierre_base.jpg ya trae el escudo (versión línea) y la franja roja. -->
         <div class="frame-in">
           <div class="cierre-caja">

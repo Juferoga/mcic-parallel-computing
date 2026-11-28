@@ -240,6 +240,7 @@ def main():
         "carriles": leer("carriles.json"),
         "walkforward": wf,
         "accesibilidad": leer("accesibilidad.json") if (RES / "accesibilidad.json").exists() else None,
+        "economia": leer("economia.json"),
         "ranking": {"mixto": ranking("mixto"), "exclusivo": ranking("exclusivo")},
         "confiables": {"mixto": menos_confiables("mixto"), "exclusivo": menos_confiables("exclusivo")},
         "mapa_tramos": mapa_tramos(),
